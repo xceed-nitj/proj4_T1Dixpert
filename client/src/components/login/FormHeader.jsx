@@ -90,12 +90,12 @@ const FormHeader = () => {
       </Flex>
 
       <Text
-        fontSize={{ base: '2xl', md: '3xl', lg: '4xl' }}
+        fontSize={{ base: '2xl', md: '3xl', lg: '2xl' }}
         textAlign={'center'}
         fontWeight='bold'
         mb={2}
       >
-        Welcome to TiD
+        Welcome to T1DiXpert
       </Text>
       <Text
         fontSize='md'

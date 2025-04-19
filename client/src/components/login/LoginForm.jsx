@@ -120,8 +120,8 @@ const LoginForm = () => {
           <Button
             isLoading={isLoading}
             type='submit'
-            colorScheme='blackAlpha'
-            bg={'blackAlpha.900 !important'}
+            colorScheme='radial-gradient(circle at 0% 0%,rgb(70, 125, 203),rgb(16, 77, 157))'
+            bg={'radial-gradient(circle at 0% 0%,rgb(26, 87, 172),rgb(8, 27, 51)) !important'}
             width={'100%'}>
             Login
           </Button>
