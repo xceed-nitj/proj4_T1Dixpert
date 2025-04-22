@@ -2,14 +2,13 @@
 function getEnvironment() {
   const currentURL = window.location.href;
   const development = 'http://localhost:8010';
-  const production = 'https://nitjtt.onrender.com';
-  const nitjServer = 'https://xceed.nitj.ac.in';
+  const production = 'https://jellyfish-app-7ccid.ondigitalocean.app';
+  const nitjServer = 'https://jellyfish-app-7ccid.ondigitalocean.app';
   if (currentURL.includes('localhost')) {
     return development;
   } else if (currentURL.includes('nitjtt')) {
     return production;
   } else {
-    // Default to a specific environment or handle other cases
     return nitjServer;
   }
 }
