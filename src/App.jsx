@@ -52,7 +52,7 @@ import ErrorPage from './pages/ErrorPage.jsx';
 import animation404 from '../public/404.json';
 import { LogoAnimation } from './components/login/LogoAnimation.jsx';
 import Form from './platform/Form.jsx';
-import UserManagement from './dashboard/UserManagement.jsx';
+import UserManagementPage from './dashboard/UserManagement.jsx';
 
 //import diabetic modules
 import HospitalForm from './diabeticsModule/components/HospitalForm.jsx';
@@ -94,7 +94,7 @@ function App() {
         <Route path="/register" element={<RegistrationForm />} />
         <Route path="/userroles" element={<AllocatedRolesPage />} />
         <Route path="/superadmin" element={<SuperAdminPage />} />
-        <Route path="/usermanagement" element={<UserManagement />} />
+        <Route path="/usermanagement" element={<UserManagementPage />} />
         <Route path="/404" element={<ErrorPage
   message="Oops! Page not found."
   animation={<Lottie animationData={animation404} style={{opacity:'20%'}} />}
