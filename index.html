@@ -3,18 +3,18 @@
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" id="favicon" type="image/svg+xml" href="logo-mark-white.svg" />
+  <link rel="icon" id="favicon" type="image" href="fav.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>T1D-NITJ</title>
+  <title>iT1Dxpert</title>
   <script>
     function setFavicon() {
       const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
       const favicon = document.getElementById('favicon');
 
       if (darkModeMediaQuery.matches) {
-        favicon.href = 'logo-mark-white.svg';
+        favicon.href = 'fav.png';
       } else {
-        favicon.href = 'logo-mark-black.svg';
+        favicon.href = 'fav.png';
       }
     }
 

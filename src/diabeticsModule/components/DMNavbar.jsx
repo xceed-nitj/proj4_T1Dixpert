@@ -26,7 +26,6 @@ import { axiosInstance } from '../api/config';
 
 const DMNavbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [userRole, setUserRole] = useState(null);
   const [userDetails, setUserDetails] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -40,11 +39,8 @@ const DMNavbar = () => {
     const getUserDetails = async () => {
       try {
         const response = await axiosInstance.get('/user/getuser/');
-
         const userdetail = response.data;
         setUserDetails(userdetail);
-        // Assuming the role is stored in userdetail.role
-        setUserRole(userdetail.role);
       } catch (error) {
         console.error('Error fetching user details:', error.message);
       }
@@ -69,12 +65,15 @@ const DMNavbar = () => {
     }
   };
 
+  const handleLogin = () => {
+    navigate('/login');
+  };
+
   const getNavLinks = () => {
     if (!userDetails?.user?.role) return [];
 
     const roles = userDetails.user.role;
 
-    // Admin has access to all links
     if (roles.includes('dm-admin')) {
       return [
         { name: 'Dashboard', path: '/dm/admin/dashboard', icon: FiHome },
@@ -84,28 +83,15 @@ const DMNavbar = () => {
       ];
     }
 
-    // Doctor links
     if (roles.includes('doctor')) {
       return [
         { name: 'Dashboard', path: '/dm/doctor/dashboard', icon: FiHome },
-        // {
-        //   name: 'Add Daily Dosage',
-        //   path: '/dm/addDailyDosage',
-        //   icon: FiActivity,
-        // },
-        // { name: 'Add Sick Day', path: '/dm/addSickDay', icon: FiActivity },
       ];
     }
 
-    // Patient links
     if (roles.includes('patient')) {
       return [
         { name: 'Dashboard', path: '/dm/patient/dashboard', icon: FiHome },
-        // {
-        //   name: 'History',
-        //   path: `/dm/patient/${userDetails?.user._id}/history`,
-        //   icon: FiActivity,
-        // },
       ];
     }
 
@@ -151,8 +137,9 @@ const DMNavbar = () => {
       borderColor={borderColor}
     >
       <Flex h={14} alignItems="center" justifyContent="space-between" px={2}>
+        {/* Logo */}
         <Flex alignItems="center">
-          <Link to="/dm/login">
+          <Link to="/">
             <Flex alignItems="center">
               <img
                 src="/dm/it1d-logo.jpeg"
@@ -165,25 +152,37 @@ const DMNavbar = () => {
 
         {/* Desktop Navigation */}
         <HStack spacing={1} display={{ base: 'none', md: 'flex' }}>
-          {getNavLinks().map((link) => (
-            <NavLink key={link.path} {...link} />
-          ))}
-          {userDetails && (
-            <Flex align="center" gap={3} ml={2}>
-              <Text fontSize="sm" color="cyan.500">
-                {userDetails.user.email}
-              </Text>
-              <Button
-                colorScheme="teal"
-                variant="ghost"
-                size="sm"
-                onClick={handleLogout}
-                leftIcon={<FiLogOut />}
-                px={3}
-              >
-                Logout
-              </Button>
-            </Flex>
+          {userDetails ? (
+            <>
+              {getNavLinks().map((link) => (
+                <NavLink key={link.path} {...link} />
+              ))}
+              <Flex align="center" gap={3} ml={2}>
+                <Text fontSize="sm" color="cyan.500">
+                  {userDetails.user.email}
+                </Text>
+                <Button
+                  colorScheme="teal"
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleLogout}
+                  leftIcon={<FiLogOut />}
+                  px={3}
+                >
+                  Logout
+                </Button>
+              </Flex>
+            </>
+          ) : (
+            <Button
+              colorScheme="blue"
+              variant="solid"
+              size="sm"
+              onClick={handleLogin}
+              px={5}
+            >
+              Login
+            </Button>
           )}
         </HStack>
 
@@ -203,25 +202,37 @@ const DMNavbar = () => {
       {isOpen && (
         <Box pb={3} display={{ md: 'none' }}>
           <VStack spacing={1}>
-            {getNavLinks().map((link) => (
-              <NavLink key={link.path} {...link} />
-            ))}
-            {userDetails && (
-              <Flex align="center" gap={3} w="100%" px={3} py={2}>
-                <Text fontSize="sm" color="cyan.500">
-                  {userDetails.user.email}
-                </Text>
-                <Button
-                  colorScheme="teal"
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleLogout}
-                  leftIcon={<FiLogOut />}
-                  px={3}
-                >
-                  Logout
-                </Button>
-              </Flex>
+            {userDetails ? (
+              <>
+                {getNavLinks().map((link) => (
+                  <NavLink key={link.path} {...link} />
+                ))}
+                <Flex align="center" gap={3} w="100%" px={3} py={2}>
+                  <Text fontSize="sm" color="cyan.500">
+                    {userDetails.user.email}
+                  </Text>
+                  <Button
+                    colorScheme="teal"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleLogout}
+                    leftIcon={<FiLogOut />}
+                    px={3}
+                  >
+                    Logout
+                  </Button>
+                </Flex>
+              </>
+            ) : (
+              <Button
+                colorScheme="blue"
+                variant="solid"
+                size="sm"
+                onClick={handleLogin}
+                px={5}
+              >
+                Login
+              </Button>
             )}
           </VStack>
         </Box>

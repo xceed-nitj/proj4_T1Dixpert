@@ -62,7 +62,7 @@ const StarryBackgroundAnimation = () => {
     }
 
     return (
-        <div className="stars dark:tw-bg-gray-900">
+        <div className="stars dark:tw-bg-white-900">
             {stars}
         </div>
     );

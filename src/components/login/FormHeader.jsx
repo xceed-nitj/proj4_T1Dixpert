@@ -95,7 +95,7 @@ const FormHeader = () => {
         fontWeight='bold'
         mb={2}
       >
-        Welcome to T1DiXpert
+        Welcome to iT1DXpert
       </Text>
       <Text
         fontSize='md'

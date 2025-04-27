@@ -60,7 +60,7 @@ function ErrorPage(props) {
                 >
                     <div>
                         <h3 
-                            className="tw-mb-5 tw-text-4xl tw-font-extrabold tw-tracking-tight tw-leading-none tw-text-white md:tw-text-3xl lg:tw-text-4xl">
+                            className="tw-mb-5 tw-text-4xl tw-font-extrabold tw-tracking-tight tw-leading-none tw-text-cyan-600 md:tw-text-3xl lg:tw-text-4xl">
                             {props.message}
                         </h3>
                     </div>

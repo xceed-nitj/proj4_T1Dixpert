@@ -51,98 +51,8 @@ import Home from './pages/Home';
 import ErrorPage from './pages/ErrorPage.jsx';
 import animation404 from '../public/404.json';
 import { LogoAnimation } from './components/login/LogoAnimation.jsx';
-import EventRegistration from './certificatemodule/pages/eventregistration';
-import CMDashboard from './certificatemodule/pages/cmdashboard';
-import CertificateForm from './certificatemodule/pages/certificatedesign';
-// import Certificate from './certificatemodule/pages/certificatetemplates/Certificate';
-import ServicePage from './pages/Service';
-import Participant from './certificatemodule/pages/participantdataupload';
-import UserEvents from './certificatemodule/pages/UserEvents';
-import UserLogos from './certificatemodule/pages/UserLogo.jsx';
-import UserSignatures from './certificatemodule/pages/UserSignatures.jsx';
-
-import EODashboard from './conferencemodule/layout/eodashboard';
-import HomeConf from './conferencemodule/Tabs/HomeConf';
-import Sidebar from './conferencemodule/components/Sidebar';
-import Speaker from './conferencemodule/Tabs/Speaker';
-import Committees from './conferencemodule/Tabs/Committees';
-import Sponsors from './conferencemodule/Tabs/Sponsors';
-import Awards from './conferencemodule/Tabs/Awards';
-import Announcement from './conferencemodule/Tabs/Annoumcement';
-import Contacts from './conferencemodule/Tabs/Contacts';
-import Images from './conferencemodule/Tabs/Images';
-import EventDates from './conferencemodule/Tabs/EventDates';
-import Participants from './conferencemodule/Tabs/Participants';
-import NavbarConf from './conferencemodule/Tabs/NavbarConf';
-import Location from './conferencemodule/Tabs/Location';
-import CommonTemplate from './conferencemodule/Tabs/CommonTemplate';
-import ConferencePage from './conferencemodule/Tabs/ConferencePage';
-
-import Template01 from './certificatemodule/pages/certificatetemplates/akleem';
-// import ViewCertificate from './certificatemodule/pages/participantCerti';
-import Template03 from './certificatemodule/pages/certificatetemplates/03_sarthak';
-
-// Review Module Imports
-import PRMEventRegistration from './reviewmodule/pages/eventregistration';
-import PRMDashboard from './reviewmodule/pages/prmdashboard';
-import ReviewLogin from './reviewmodule/pages/ReviewLogin';
-import CreateUser from './reviewmodule/pages/CreateUser';
-import AddReviewer from './reviewmodule/pages/AddReviewer';
-import Review from './reviewmodule/pages/Review.jsx';
-import PaperSummary from './reviewmodule/pages/PaperSummary.jsx';
-import Forms from './reviewmodule/pages/Forms.jsx';
-import FormAnswers from './reviewmodule/pages/FormAnswers.jsx';
-import ReviewerQuestion from './reviewmodule/pages/ReviewQuestion';
-import DefaultQuestion from './reviewmodule/pages/DefaultQuestion.jsx';
-import ReviewerQuestionHome from './reviewmodule/pages/ReviewQuestionHome';
-import StartSubmission from './reviewmodule/pages/StartSubmission.jsx';
-import DefaultQuestionHome from './reviewmodule/pages/DefaultQuestionHome.jsx';
-import UpdateReviewerStatus from './reviewmodule/pages/UpdateReviewerStatus';
-import UserRegistration from './reviewmodule/pages/userRegistration';
-import OTPverification from './reviewmodule/pages/OTPverification.jsx';
-import UserDetails from './reviewmodule/pages/UserDetails.jsx';
-
-// import HomePage from './reviewmodule/pages/Main';
-
-import PrmEditorDashboard from './reviewmodule/pages/PrmEditorDashboard';
-
-// import ConferenceDetails from './reviewmodule/pages/EditorConferencePage';
-import AllPaper from './reviewmodule/pages/allpapers';
-import EventForm from './reviewmodule/pages/editorevent';
-import MultiEditorEvent from './reviewmodule/pages/addeditor';
-import PaperDetails from './reviewmodule/components/PaperDetails';
-
-import ReviewerAcceptance from './reviewmodule/pages/ReviewerAcceptance';
-
-import SponsorshipRate from './conferencemodule/Tabs/SponsorshipRates';
-import Accomodation from './conferencemodule/Tabs/Accomodation';
-import Event from './conferencemodule/Tabs/Events';
-import Souvenir from './conferencemodule/Tabs/Souvenir';
-import MultiStepForm from './reviewmodule/pages/MultiStepForm';
-import HomePage from './reviewmodule/pages/Main';
-import AddTrack from './reviewmodule/pages/addTracks';
-import AddTemplate from './reviewmodule/pages/addTemplate';
-import EditTemplate from './reviewmodule/pages/EditTemplate';
-import EditDefaultTemplate from './reviewmodule/pages/EditDefaultTemplate.jsx';
-import NirfRanking from './nirf/rankings';
-import AddPaper from './reviewmodule/pages/addpaper';
-
-// imports for Quiz Module
-import CreateQuiz from './quizModule/creator/createQuiz/CreateQuiz';
-import AddQuestionHome from './quizModule/creator/addQuestion/AddQuestionHome';
-import AddInstruction from './quizModule/creator/addQuestion/AddInstruction';
-import PreviewInstructions from './quizModule/creator/addQuestion/PreviewInstructions';
-import Settings from './quizModule/creator/addQuestion/settings';
-import PrmEdDashboard from './reviewmodule/pages/PrmEdDashboard';
-import Quizzing from './quizModule/student/quizzing/Quizzing';
-// import Instructions from './quizModule/student/Instructions';
-import QuizFeedback from './quizModule/student/quizFeedback/QuizFeedback';
-import UserManagement from './dashboard/userManagement';
-import UserEventRegistration from './certificatemodule/pages/addEvent';
-
 import Form from './platform/Form.jsx';
-import AllForms from './reviewmodule/pages/AllForms.jsx';
-import Reviews from './reviewmodule/pages/Reviews.jsx';
+import UserManagement from './dashboard/UserManagement.jsx';
 
 //import diabetic modules
 import HospitalForm from './diabeticsModule/components/HospitalForm.jsx';
@@ -160,6 +70,7 @@ import DoctorDashboard from './diabeticsModule/pages/DoctorDashboard';
 import PatientDetailView from './diabeticsModule/pages/PatientDetailView';
 import LoginPage from './diabeticsModule/pages/LoginPage';
 
+
 // Detail View Routes for Admin
 import DoctorDetailView from './diabeticsModule/pages/DoctorDetailView';
 import HospitalDetailView from './diabeticsModule/pages/HospitalDetailView';
@@ -175,10 +86,7 @@ function App() {
       <Routes>
         {/* Landing Page */}
         <Route path="/" element={<Login/>} />
-        {/* <Route path="/nirf" element={<NirfRanking />} /> */}
-
-        {/* <Route path="/services/:serviceId" element={<ServicePage />} /> */}
-        {/* ********* */}
+      
 
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -187,7 +95,13 @@ function App() {
         <Route path="/userroles" element={<AllocatedRolesPage />} />
         <Route path="/superadmin" element={<SuperAdminPage />} />
         <Route path="/usermanagement" element={<UserManagement />} />
-
+        <Route path="/404" element={<ErrorPage
+  message="Oops! Page not found."
+  animation={<Lottie animationData={animation404} style={{opacity:'20%'}} />}
+  destinationName={false}   // No redirect
+  destination=""            // Empty destination
+/>
+} />
 
 
         <Route
@@ -202,6 +116,7 @@ function App() {
         {/* Routes for Diabetics Module */}
         {/* Authentication */}
         <Route path="/dm/login" element={<LoginPage />} />
+
 
         {/* Admin Routes */}
         <Route path="/dm/admin/dashboard" element={<AdminDashboard />} />
