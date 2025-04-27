@@ -52,7 +52,7 @@ import ErrorPage from './pages/ErrorPage.jsx';
 import animation404 from '../public/404.json';
 import { LogoAnimation } from './components/login/LogoAnimation.jsx';
 import Form from './platform/Form.jsx';
-import UserManagementPage from './dashboard/UserManagement.jsx';
+import UserManagementPage from './dashboard/userManagement.jsx';
 
 //import diabetic modules
 import HospitalForm from './diabeticsModule/components/HospitalForm.jsx';
