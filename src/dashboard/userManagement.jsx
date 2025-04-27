@@ -36,7 +36,7 @@ import getEnvironment from '../getenvironment';
 
 const apiUrl = getEnvironment();
 
-const UserManagementPage = () => {
+const UserManagement = () => {
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedRoles, setSelectedRoles] = useState({});
@@ -354,4 +354,4 @@ const UserManagementPage = () => {
   );
 };
 
-export default UserManagementPage;
+export default UserManagement;
