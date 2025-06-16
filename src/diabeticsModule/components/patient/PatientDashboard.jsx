@@ -128,7 +128,7 @@ export default function PatientDashboard() {
         <Button
           as={RouterLink}
           to={`/dm/patient/${patient?._id}/history`}
-          colorScheme="teal"
+          colorScheme="blue"
           leftIcon={<FiCalendar />}
         >
           View History
