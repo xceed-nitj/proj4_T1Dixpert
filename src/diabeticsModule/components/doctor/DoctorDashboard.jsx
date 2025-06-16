@@ -211,7 +211,7 @@ export default function DoctorDashboard() {
           value={stats.missingReadings}
           description="No recent data"
           icon={FiBarChart2}
-          color="cyan.300"
+          color="cyan.700"
         />
       </SimpleGrid>
 
