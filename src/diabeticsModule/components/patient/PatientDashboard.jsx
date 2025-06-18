@@ -4,6 +4,8 @@ import {
   Button,
   Container,
   Flex,
+  Grid,
+  GridItem,
   HStack,
   Heading,
   Icon,
@@ -18,7 +20,7 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 import { format } from 'date-fns';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   FiActivity,
   FiBarChart2,
@@ -46,13 +48,31 @@ import {
   getPatientDailyDosageByDate,
   getPatientDailyDosageByRange,
 } from '../../api/dailyDosageApi';
+import { use } from 'react';
 
 export default function PatientDashboard() {
   const [patient, setPatient] = useState(null);
   const [todaysReadings, setTodaysReadings] = useState([]);
   const [weekData, setWeekData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedContent, setSelectedContent] = useState('bloodSugar');
+  const [selectedRange, setSelectedRange] = useState(14);
 
+  // Add these configuration arrays
+  const contentOptions = [
+    { value: 'bloodSugar', label: 'Blood Sugar', color: '#5BA9B3', unit: 'mg/dL' },
+    { value: 'carboLevel', label: 'Carbohydrates', color: '#3B5998', unit: 'g' },
+    { value: 'insulin', label: 'Insulin', color: '#FF8C00', unit: 'units' },
+    { value: 'longLastingInsulin', label: 'Long Lasting Insulin', color: '#805AD5', unit: 'units' },
+  ];
+
+  const rangeOptions = [
+    { value: 3, label: '3 Days' },
+    { value: 7, label: '1 Week' },
+    { value: 14, label: '2 Weeks' },
+    { value: 30, label: '1 Month' },
+    { value: 90, label: '3 Months' },
+  ];
   // Get current patient info
   const fetchPatientData = async () => {
     try {
@@ -75,39 +95,109 @@ export default function PatientDashboard() {
       console.error("Error fetching today's readings:", error);
     }
   };
-
-  // Get week's data for chart
-  const fetchWeekData = async () => {
-    try {
-      // Get data for the last 7 days
-      const endDate = new Date();
-      const startDate = new Date();
-      startDate.setDate(startDate.getDate() - 6);
-
-      const data = await getPatientDailyDosageByRange(
-        startDate.toISOString(),
-        endDate.toISOString()
-      );
-
-      if (data && data.length > 0) {
-        const readings = data.map((reading) => reading.data);
-        setWeekData(readings);
-      } else {
-        setWeekData([]);
-      }
-    } catch (error) {
-      console.error('Error fetching week data:', error);
+const fetchWeekData = async () => {
+  try {
+    console.log('Fetching week data for range:', selectedRange);
+    
+    // Fix date calculation - ensure we get full days
+    const endDate = new Date();
+    endDate.setHours(23, 59, 59, 999); // End of today
+    
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - (selectedRange - 1));
+    startDate.setHours(0, 0, 0, 0); // Start of the day
+    
+    console.log('Date Range:', {
+      start: startDate.toISOString(),
+      end: endDate.toISOString(),
+      startFormatted: startDate.toLocaleDateString(),
+      endFormatted: endDate.toLocaleDateString()
+    });
+    
+    const data = await getPatientDailyDosageByRange(
+      startDate.toISOString(),
+      endDate.toISOString()
+    );
+    
+    console.log('API returned data:', data);
+    console.log('Data length:', data?.length);
+    
+    if (data && data.length > 0) {
+      // Flatten the data arrays from all items
+      const allReadings = data.flatMap((item) => {
+        console.log('Processing item:', item);
+        console.log('Item data length:', item.data?.length);
+        return item.data || [];
+      });
+      
+      console.log('All flattened readings:', allReadings);
+      console.log('Total readings count:', allReadings.length);
+      setWeekData(allReadings);
+    } else {
       setWeekData([]);
-    } finally {
-      setLoading(false);
     }
-  };
+  } catch (error) {
+    console.error('Error fetching week data:', error);
+    setWeekData([]);
+  } finally {
+    setLoading(false);
+  }
+};
 
-  useEffect(() => {
-    fetchPatientData();
-    fetchTodaysReadings();
+// Filter the data for the selected range/content
+const filteredData = useMemo(() => {
+  console.log('Filtering week data for range:', selectedRange);
+  console.log('Week Data:', weekData);
+
+  const result = weekData || [];
+  console.log('Filtered Data:', result);
+
+  return result;
+}, [weekData, selectedRange]);
+
+// Calculate Y-axis domain
+const yAxisDomain = useMemo(() => {
+  if (filteredData.length === 0) return [0, 100];
+
+  const values = filteredData
+    .map(item => {
+      const value = item[selectedContent];
+      console.log(`Extracted value for ${selectedContent}:`, value);
+      return value != null ? value : null;
+    })
+    .filter(val => val != null);
+
+  if (values.length === 0) return [0, 100];
+
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const tolerance = (max - min) * 0.2; // 20% padding
+
+  return [
+    Math.max(0, Math.floor(min - tolerance)),
+    Math.ceil(max + tolerance)
+  ];
+}, [filteredData, selectedContent]);
+
+// Get selected content's config (label, unit, color)
+const selectedContentConfig = contentOptions.find(
+  opt => opt.value === selectedContent
+);
+
+// Initial data fetching
+useEffect(() => {
+  fetchPatientData();
+  fetchTodaysReadings();
+  fetchWeekData();
+}, []);
+
+// Refetch when dropdowns change
+useEffect(() => {
+  if (!loading) {
     fetchWeekData();
-  }, []);
+  }
+}, [selectedRange, selectedContent]);
+
 
   const cardBg = useColorModeValue('white', 'gray.800');
 
@@ -118,7 +208,6 @@ export default function PatientDashboard() {
       </Flex>
     );
   }
-
   return (
     <Container maxW="container.xl" py={8}>
       <Flex justify="space-between" align="center" mb={8}>
@@ -262,7 +351,7 @@ export default function PatientDashboard() {
         <Heading as="h2" size="md" mb={4}>
           <Flex align="center">
             <Icon as={FiBarChart2} mr={2} />
-            7-Day Trends
+            Health Trend  
           </Flex>
         </Heading>
 
@@ -270,12 +359,64 @@ export default function PatientDashboard() {
           History of your blood sugar, carbohydrate intake, and insulin dosage
           over the past week
         </Text>
-
-        {weekData.length > 0 ? (
-          <Box h="300px">
+        {/* dropdown controls */}
+        <Grid templateColumns={['1fr' ,null,'repeat(2, 1fr)']} 
+            gap={4} 
+            mb={6}
+            alignItems="end"
+            >
+          <GridItem>
+            <Text mb={2} fontsize="sm" fontWeight="medium" color="gray.700">
+              Select Content
+            </Text>
+            <Box
+              as="select"
+              value={selectedContent}
+              onChange={(e) => setSelectedContent(e.target.value)}
+              bg="white"
+              border="1px solid"
+              borderColor="gray.300"
+              px={3}
+              py={2}
+              w="100%"
+              borderRadius="md"
+              >
+                {contentOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </Box>
+              </GridItem>
+              <GridItem>
+                <Text mb={2} fontSize="sm" fontWeight="medium" color="gray.700">
+                  Select Timeframe
+                </Text>
+                <Box
+                  as="select"
+                  width="100%"
+                  value={selectedRange}
+                  onChange={(e) => setSelectedRange(e.target.value)}
+                  bg="white"
+                  border="1px solid"
+                  borderColor="gray.300"
+                  px={3}
+                  py={2}
+                  borderRadius="md"
+                >
+                  {rangeOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </Box>
+              </GridItem>
+            </Grid>
+            {filteredData.length > 0 ? (
+          <Box h="400px">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
-                data={weekData}
+                data={filteredData}
                 margin={{
                   top: 5,
                   right: 30,
@@ -291,56 +432,42 @@ export default function PatientDashboard() {
                     const [date, time] = dateTime.split(' ');
                     return `${format(new Date(date), 'MMM dd')} / ${time}`;
                   }}
+                  angle={-45}
+                  textAnchor="end"
+                  height={80}
+                  interval="preserveStartEnd"
                 />
-                <YAxis yAxisId="left" />
-                <YAxis yAxisId="right" orientation="right" />
+                <YAxis 
+                    domain={yAxisDomain}
+                    label={{
+                      value: `${selectedContentConfig?.label} (${selectedContentConfig.unit})`,
+                      angle: -90,
+                      position: 'insideLeft',
+                      offset: 10,
+                      style: { textAnchor: 'middle', fill: '#666', fontSize: 17 },
+                    }}
+                    />
                 <Tooltip
                   labelFormatter={(dateTime) => {
                     if (!dateTime) return '';
                     const [date, time] = dateTime.split(' ');
                     return `${format(new Date(date), 'MMM dd')} at ${time}`;
                   }}
+                  formatter={value => [
+                    `${value} ${selectedContentConfig?.unit}`,
+                    selectedContentConfig?.label,
+                  ]}
                 />
                 <Legend />
                 <Line
-                  yAxisId="left"
+                  // yAxisId="right"
                   type="monotone"
-                  dataKey="bloodSugar"
-                  name="Blood Sugar"
-                  stroke="#5BA9B3"
+                  dataKey={selectedContent}
+                  name={selectedContentConfig?.label}
+                  stroke={selectedContentConfig?.color}
                   strokeWidth={2}
-                  dot={{ r: 4 }}
-                  activeDot={{ r: 6 }}
-                />
-                <Line
-                  yAxisId="left"
-                  type="monotone"
-                  dataKey="carboLevel"
-                  name="Carbs"
-                  stroke="#3B5998"
-                  strokeWidth={2}
-                  dot={{ r: 4 }}
-                  activeDot={{ r: 6 }}
-                />
-                <Line
-                  yAxisId="right"
-                  type="monotone"
-                  dataKey="insulin"
-                  name="Insulin"
-                  stroke="#FF8C00"
-                  strokeWidth={2}
-                  dot={{ r: 4 }}
-                  activeDot={{ r: 6 }}
-                />
-                <Line
-                  yAxisId="right"
-                  type="monotone"
-                  dataKey="longLastingInsulin"
-                  name="Long Lasting Insulin"
-                  stroke="#805AD5"
-                  strokeWidth={2}
-                  dot={{ r: 4 }}
-                  activeDot={{ r: 6 }}
+                  dot={{ r: 5 }}
+                  activeDot={{ r: 7 }}
                 />
               </LineChart>
             </ResponsiveContainer>
