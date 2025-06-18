@@ -422,6 +422,92 @@ const testDateRange = () => {
             </TabList>
 
             <TabPanels>
+               <TabPanel p={0} pt={4}>
+                <Card variant="outline">
+                  <CardHeader>
+                    <Heading size="md">
+                      <Flex align="center">
+                        <Icon as={FiBarChart2} mr={2} />
+                        Health Trends
+                      </Flex>
+                    </Heading>
+                  </CardHeader>
+                  <CardBody>
+                    {chartData.length > 0 ? (
+                      <Box h="400px">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <LineChart
+                            data={chartData}
+                            margin={{
+                              top: 5,
+                              right: 30,
+                              left: 20,
+                              bottom: 5,
+                            }}
+                          >
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis
+                              dataKey="date"
+                              tickFormatter={(date) =>
+                                format(new Date(date), 'MMM dd')
+                              }
+                            />
+                            <YAxis yAxisId="left" />
+                            <YAxis yAxisId="right" orientation="right" />
+                            <Tooltip
+                              labelFormatter={(date) =>
+                                format(new Date(date), 'MMM dd, yyyy')
+                              }
+                            />
+                            <Legend />
+                            <Line
+                              yAxisId="left"
+                              type="monotone"
+                              dataKey="bloodSugar"
+                              name="Blood Sugar"
+                              stroke="#5BA9B3"
+                              strokeWidth={2}
+                              dot={{ r: 4 }}
+                              activeDot={{ r: 6 }}
+                            />
+                            <Line
+                              yAxisId="left"
+                              type="monotone"
+                              dataKey="carboLevel"
+                              name="Carbs"
+                              stroke="#3B5998"
+                              strokeWidth={2}
+                              dot={{ r: 4 }}
+                              activeDot={{ r: 6 }}
+                            />
+                            <Line
+                              yAxisId="right"
+                              type="monotone"
+                              dataKey="insulin"
+                              name="Insulin"
+                              stroke="#FF8C00"
+                              strokeWidth={2}
+                              dot={{ r: 4 }}
+                              activeDot={{ r: 6 }}
+                            />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </Box>
+                    ) : (
+                      <Flex
+                        direction="column"
+                        align="center"
+                        justify="center"
+                        h="400px"
+                        bg="gray.50"
+                        borderRadius="md"
+                      >
+                        <Text color="gray.500">No readings available</Text>
+                      </Flex>
+                    )}
+                  </CardBody>
+                </Card>
+              </TabPanel>
               <TabPanel p={0} pt={4}>
                 <Card variant="outline">
                   <CardHeader>
