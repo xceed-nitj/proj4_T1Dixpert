@@ -200,40 +200,57 @@ const AdminDashboard = () => {
         </Flex>
       </Flex>
 
-      <Box borderWidth="1px" borderRadius="lg" overflow="hidden" mt={6} bg={bg}>
-        <Tabs isFitted variant="enclosed">
-          <TabList>
-            <Tab
-              _selected={{
-                color: 'cyan.800',
-                bg: 'cyan.100',
-                borderBottomColor: 'transparent',
-              }}
-            >
-              Patients
-            </Tab>
-            <Tab
-              _selected={{
-                color: 'blue.800',
-                bg: 'blue.100',
-                borderBottomColor: 'transparent',
-              }}
-            >
-              Doctors
-            </Tab>
-            <Tab
-              _selected={{
-                color: 'teal.800',
-                bg: 'teal.100',
-                borderBottomColor: 'transparent',
-              }}
-            >
-              Hospitals
-            </Tab>
-          </TabList>
-
+  <Box borderWidth="1px" borderRadius="lg" bg="white" overflow={"hidden"} boxShadow="md"  > 
+  <Tabs variant="enclosed" isFitted>
+    <TabList borderBottom="1px solid" borderColor="gray.400">
+      <Tab
+        _selected={{
+          color: 'cyan.800',
+          bg: 'cyan.100',
+          borderBottomColor: 'transparent', 
+        }}
+        m={0}
+        // p={0}
+        borderRadius={0}
+        borderRightWidth="1px"
+        borderRightColor="gray.200"
+        borderStyle="solid"
+      >
+        Patients
+      </Tab>
+      <Tab
+        _selected={{
+          color: 'blue.800',
+          bg: 'blue.100',
+          borderBottomColor: 'transparent',
+        }}
+        m={0}
+        // p={0}
+        borderRadius={0}
+        borderRightWidth="1px"
+        borderRightColor="gray.200"
+        borderStyle="solid"
+      >
+        Doctors
+      </Tab>
+      <Tab
+        _selected={{
+          color: 'teal.800',
+          bg: 'teal.100',
+          borderBottomColor: 'transparent',
+        }}
+        m={0}
+        // p={0}
+        borderRadius={0}
+        borderRightWidth="1px"
+        borderRightColor="gray.200"
+        borderStyle="solid"
+      >
+        Hospitals
+      </Tab>
+    </TabList>
           <TabPanels>
-            <TabPanel bg="cyan.100">
+            <TabPanel bg="cyan.100" >
               <DataList
                 items={patients}
                 fields={['name', 'age', 'contactNumber', 'hospital']}
@@ -242,7 +259,7 @@ const AdminDashboard = () => {
                 type="patients"
               />
             </TabPanel>
-            <TabPanel bg="blue.100">
+            <TabPanel bg="blue.100" >
               <DataList
                 items={doctors}
                 fields={['name', 'age', 'contactNumber', 'hospital']}
@@ -251,18 +268,18 @@ const AdminDashboard = () => {
                 type="doctors"
               />
             </TabPanel>
-            <TabPanel bg="teal.100">
+            <TabPanel bg="teal.100" >
               <DataList
                 items={hospitals}
-                fields={['name', 'location', 'phone']}
-                headers={['Name', 'Location', 'Phone']}
+                fields={['name', 'location', 'phone', 'action']}
+                headers={['Name', 'Location', 'Phone', 'Actions']}
                 emptyText="No hospitals registered yet"
                 type="hospitals"
               />
             </TabPanel>
           </TabPanels>
         </Tabs>
-      </Box>
+       </Box> 
     </Container>
   );
 };
@@ -299,7 +316,9 @@ const DataList = ({ items, fields, headers, emptyText, type }) => {
 
   return (
     <Box overflowX="auto">
-      <chakra.table w="full">
+      <chakra.table w="full"
+      border="1px solid #CBD5E0"
+      borderCollapse="collapse" >
         <chakra.thead>
           <chakra.tr>
             {headers.map((header, i) => (
@@ -316,7 +335,17 @@ const DataList = ({ items, fields, headers, emptyText, type }) => {
                 {header}
               </chakra.th>
             ))}
-            <chakra.th width="80px"></chakra.th>
+            <chakra.th width="80px"
+              px={4}
+              py={2}
+              borderBottom="1px"
+              borderColor={borderColor}
+              textAlign="right"
+              fontSize="sm"
+              fontWeight="semibold"
+            >
+              Actions
+            </chakra.th>
           </chakra.tr>
         </chakra.thead>
         <chakra.tbody>
