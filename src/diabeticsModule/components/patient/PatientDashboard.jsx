@@ -19,7 +19,7 @@ import {
   VStack,
   useColorModeValue,
 } from '@chakra-ui/react';
-import { format } from 'date-fns';
+import { format, eachDayOfInterval } from 'date-fns';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   FiActivity,
@@ -49,6 +49,7 @@ import {
   getPatientDailyDosageByRange,
 } from '../../api/dailyDosageApi';
 import { use } from 'react';
+import DailyEntryStatusBar from './DailyEntryStatusBar';
 
 export default function PatientDashboard() {
   const [patient, setPatient] = useState(null);
@@ -71,7 +72,6 @@ export default function PatientDashboard() {
     { value: 7, label: '1 Week' },
     { value: 14, label: '2 Weeks' },
     { value: 30, label: '1 Month' },
-    { value: 90, label: '3 Months' },
   ];
   // Get current patient info
   const fetchPatientData = async () => {
@@ -144,45 +144,98 @@ const fetchWeekData = async () => {
   }
 };
 
-// Filter the data for the selected range/content
-const filteredData = useMemo(() => {
-  console.log('Filtering week data for range:', selectedRange);
-  console.log('Week Data:', weekData);
-
-  const result = weekData || [];
-  console.log('Filtered Data:', result);
-
-  return result;
-}, [weekData, selectedRange]);
+const generateCompleteDataset = useMemo(() => {
+  const endDate = new Date();
+  endDate.setHours(23, 59, 59, 999);
+  
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - (selectedRange - 1));
+  startDate.setHours(0, 0, 0, 0);
+  
+  const allDays = eachDayOfInterval({ start: startDate, end: endDate });
+  
+  const completeDataset = [];
+  
+  allDays.forEach(day => {
+    const dayStr = format(day, 'yyyy-MM-dd');
+    
+    const dayEntries = weekData.filter(entry => {
+      const entryDate = format(new Date(entry.date), 'yyyy-MM-dd');
+      return entryDate === dayStr;
+    });
+    
+    if (dayEntries.length > 0) {
+      // Add all entries for this day
+      dayEntries.forEach(entry => {
+        completeDataset.push({
+          ...entry,
+         dateTimeDisplay: `${format(day, 'MMM dd')} ${entry.time || ''}`,
+          dayOnly: format(day, 'MMM dd'),
+          sortKey: `${dayStr} ${entry.time || '00:00'}`,
+          hasData: true
+        });
+      });
+    } else {
+      completeDataset.push({
+        date: dayStr,
+        time: '12:00', 
+        dateTimeDisplay: `${format(day, 'MMM dd')} (No data)`,
+        dayOnly: format(day, 'MMM dd'),
+        sortKey: `${dayStr} 12:00`,
+        [selectedContent]: null, 
+        bloodSugar: null,
+        carboLevel: null,
+        insulin: null,
+        longLastingInsulin: null,
+        hasData: false // Mark as no data
+      });
+    }
+  });
+  
+  // Sort by date and time
+  const sortedDataset = completeDataset.sort((a, b) => 
+    new Date(a.sortKey.replace(' ', 'T')).getTime() - new Date(b.sortKey.replace(' ', 'T')).getTime()
+  );
+  
+  console.log('Complete dataset:', sortedDataset);
+  return sortedDataset;
+}, [weekData, selectedRange, selectedContent]);
 
 // Calculate Y-axis domain
 const yAxisDomain = useMemo(() => {
-  if (filteredData.length === 0) return [0, 100];
+  if (generateCompleteDataset.length === 0) return [0, 100];
 
-  const values = filteredData
-    .map(item => {
-      const value = item[selectedContent];
-      console.log(`Extracted value for ${selectedContent}:`, value);
-      return value != null ? value : null;
-    })
-    .filter(val => val != null);
+  const values = generateCompleteDataset
+    .filter(item => item.hasData) 
+    .map(item => item[selectedContent])
+    .filter(val => val != null && val !== '' && !isNaN(val));
+
+  console.log('Values for Y-axis:', values);
 
   if (values.length === 0) return [0, 100];
-
-  const min = Math.min(...values);
   const max = Math.max(...values);
-  const tolerance = (max - min) * 0.2; // 20% padding
+  const tolerance = (max - 0) * 0.2; // 20% padding
 
-  return [
-    Math.max(0, Math.floor(min - tolerance)),
+  const domain = [
+    0,
     Math.ceil(max + tolerance)
   ];
-}, [filteredData, selectedContent]);
+  
+  console.log('Y-axis domain:', domain);
+  return domain;
+}, [generateCompleteDataset, selectedContent]);
 
-// Get selected content's config (label, unit, color)
-const selectedContentConfig = contentOptions.find(
-  opt => opt.value === selectedContent
-);
+    const processedChartData = useMemo(() => {
+  if (generateCompleteDataset.length === 0) return [];
+
+  return generateCompleteDataset.map((point, index) => ({
+    ...point,
+    // Use actual value if has data, otherwise use 0 or very low value
+    [selectedContent]: point.hasData ? point[selectedContent] : 0,
+    // Keep original value for tooltip
+    originalValue: point.hasData ? point[selectedContent] : null,
+  }));
+}, [generateCompleteDataset, selectedContent]);
 
 // Initial data fetching
 useEffect(() => {
@@ -193,13 +246,16 @@ useEffect(() => {
 
 // Refetch when dropdowns change
 useEffect(() => {
-  if (!loading) {
-    fetchWeekData();
-  }
+  // Always fetch week data when selectedRange or selectedContent changes
+  fetchWeekData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
 }, [selectedRange, selectedContent]);
 
 
   const cardBg = useColorModeValue('white', 'gray.800');
+
+  // Define selectedContentConfig here
+  const selectedContentConfig = contentOptions.find(option => option.value === selectedContent);
 
   if (loading) {
     return (
@@ -366,7 +422,7 @@ useEffect(() => {
             alignItems="end"
             >
           <GridItem>
-            <Text mb={2} fontsize="sm" fontWeight="medium" color="gray.700">
+            <Text mb={2} fontSize="sm" fontWeight="medium" color="gray.700">
               Select Content
             </Text>
             <Box
@@ -412,80 +468,139 @@ useEffect(() => {
                 </Box>
               </GridItem>
             </Grid>
-            {filteredData.length > 0 ? (
-          <Box h="400px">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={filteredData}
-                margin={{
-                  top: 5,
-                  right: 30,
-                  left: 20,
-                  bottom: 5,
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey={(data) => `${data.date} ${data.time}`}
-                  tickFormatter={(dateTime) => {
-                    if (!dateTime) return '';
-                    const [date, time] = dateTime.split(' ');
-                    return `${format(new Date(date), 'MMM dd')} / ${time}`;
-                  }}
-                  angle={-45}
-                  textAnchor="end"
-                  height={80}
-                  interval="preserveStartEnd"
-                />
-                <YAxis 
-                    domain={yAxisDomain}
-                    label={{
-                      value: `${selectedContentConfig?.label} (${selectedContentConfig.unit})`,
-                      angle: -90,
-                      position: 'insideLeft',
-                      offset: 10,
-                      style: { textAnchor: 'middle', fill: '#666', fontSize: 17 },
-                    }}
-                    />
-                <Tooltip
-                  labelFormatter={(dateTime) => {
-                    if (!dateTime) return '';
-                    const [date, time] = dateTime.split(' ');
-                    return `${format(new Date(date), 'MMM dd')} at ${time}`;
-                  }}
-                  formatter={value => [
-                    `${value} ${selectedContentConfig?.unit}`,
-                    selectedContentConfig?.label,
-                  ]}
-                />
-                <Legend />
+            <DailyEntryStatusBar 
+              weekData={weekData}
+              selectedRange={selectedRange}
+              selectedContent={selectedContent}
+            />
+            {generateCompleteDataset.length > 0 ? (
+  <Box h="400px">
+    <ResponsiveContainer width="100%" height="100%">
+      <LineChart
+        data={processedChartData} // CHANGED: Use generateCompleteDataset instead of filteredData
+        margin={{
+          top: 5,
+          right: 30,
+          left: 20,
+          bottom: 5,
+        }}
+      >
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis
+          dataKey="dateTimeDisplay" 
+          tick={{ fontSize: 10 }} 
+          tickFormatter={(value, index) => {
+            if (selectedRange <= 7) {
+              return value;
+            } else if (selectedRange <= 14) {
+              return index % 2 === 0 ? value : '';
+            } else {
+              return index % 3 === 0 ? value : '';
+            }
+          }}
+          angle={-45}
+          textAnchor="end"
+          height={100} 
+          interval={0} 
+        />
+        <YAxis 
+          domain={yAxisDomain} 
+          label={{
+            value: `${selectedContentConfig?.label} (${selectedContentConfig?.unit})`,
+            angle: -90,
+            position: 'insideLeft',
+            offset: 10,
+            style: { textAnchor: 'middle', fill: '#666', fontSize: 17 },
+          }}
+        />
+        <Tooltip
+          labelFormatter={(value) => {
+            return value;
+          }}
+          formatter={(value, name, props) => {
+            if (!props.payload.hasData) {
+              return ['No data', 'status'];
+            }
+            return [
+              `${!props.payload.originalValue} ${selectedContentConfig?.unit}`,
+              selectedContentConfig?.label,
+            ];
+          }}
+        />
+        
+        <Legend />
                 <Line
-                  // yAxisId="right"
-                  type="monotone"
-                  dataKey={selectedContent}
-                  name={selectedContentConfig?.label}
-                  stroke={selectedContentConfig?.color}
+          type="monotone"
+          dataKey={selectedContent}
+          name={selectedContentConfig?.label}
+          stroke={selectedContentConfig?.color || "#3B82F6"}
+          strokeWidth={2}
+          connectNulls={true} // Connect all points to create single continuous line
+          dot={(props) => {
+            const { payload, cx, cy } = props;
+            if (!payload) return null;
+            
+            if (payload.hasData) {
+              // Normal data point - filled circle
+              return (
+                <circle 
+                  cx={cx} 
+                  cy={cy} 
+                  r={4} 
+                  fill={selectedContentConfig?.color || "#3B82F6"}
+                  stroke="white"
                   strokeWidth={2}
-                  dot={{ r: 5 }}
-                  activeDot={{ r: 7 }}
                 />
-              </LineChart>
-            </ResponsiveContainer>
-          </Box>
-        ) : (
-          <Flex
-            direction="column"
-            align="center"
-            justify="center"
-            h="300px"
-            bg="gray.50"
-            borderRadius="md"
-          >
-            <Text color="gray.500">
-              No readings available for the past week
-            </Text>
-          </Flex>
-        )}
+              );
+            } else {
+              // No data point - hollow circle with "X" mark
+              return (
+                <g>
+                  <circle 
+                    cx={cx} 
+                    cy={cy} 
+                    r={6} 
+                    fill="white"
+                    stroke="#EF4444"
+                    strokeWidth={2}
+                  />
+                  {/* X mark to indicate no data */}
+                  <g stroke="#EF4444" strokeWidth={2}>
+                    <line x1={cx-3} y1={cy-3} x2={cx+3} y2={cy+3} />
+                    <line x1={cx-3} y1={cy+3} x2={cx+3} y2={cy-3} />
+                  </g>
+                </g>
+              );
+            }
+          }}
+          activeDot={{ 
+            r: 6, 
+            stroke: selectedContentConfig?.color || "#3B82F6", 
+            strokeWidth: 2, 
+            fill: 'white' 
+          }}
+        />
+      </LineChart>
+    </ResponsiveContainer>
+  </Box>
+) : (
+  // UPDATED: Better no-data message
+  <Flex
+    direction="column"
+    align="center"
+    justify="center"
+    h="300px"
+    bg="gray.50"
+    borderRadius="md"
+  >
+    <Text color="gray.500" fontSize="lg" mb={2}>
+      No readings available
+    </Text>
+    <Text color="gray.400" fontSize="sm">
+      for {selectedContentConfig?.label} in the selected time range
+    </Text>
+  </Flex>
+)}
       </Box>
 
       <Box p={6} borderRadius="lg" borderWidth="1px" bg={cardBg} boxShadow="md">
