@@ -19,7 +19,11 @@ import {
   VStack,
   useColorModeValue,
 } from '@chakra-ui/react';
+<<<<<<< HEAD
 import { format, eachDayOfInterval } from 'date-fns';
+=======
+import { format } from 'date-fns';
+>>>>>>> 72d41af3b6c07241ce1eb7b80908beacf29da9c7
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   FiActivity,
@@ -49,7 +53,10 @@ import {
   getPatientDailyDosageByRange,
 } from '../../api/dailyDosageApi';
 import { use } from 'react';
+<<<<<<< HEAD
 import DailyEntryStatusBar from './DailyEntryStatusBar';
+=======
+>>>>>>> 72d41af3b6c07241ce1eb7b80908beacf29da9c7
 
 export default function PatientDashboard() {
   const [patient, setPatient] = useState(null);
@@ -72,6 +79,10 @@ export default function PatientDashboard() {
     { value: 7, label: '1 Week' },
     { value: 14, label: '2 Weeks' },
     { value: 30, label: '1 Month' },
+<<<<<<< HEAD
+=======
+    { value: 90, label: '3 Months' },
+>>>>>>> 72d41af3b6c07241ce1eb7b80908beacf29da9c7
   ];
   // Get current patient info
   const fetchPatientData = async () => {
@@ -143,6 +154,7 @@ const fetchWeekData = async () => {
     setLoading(false);
   }
 };
+<<<<<<< HEAD
 
 const generateCompleteDataset = useMemo(() => {
   const endDate = new Date();
@@ -251,6 +263,63 @@ useEffect(() => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
 }, [selectedRange, selectedContent]);
 
+=======
+
+// Filter the data for the selected range/content
+const filteredData = useMemo(() => {
+  console.log('Filtering week data for range:', selectedRange);
+  console.log('Week Data:', weekData);
+
+  const result = weekData || [];
+  console.log('Filtered Data:', result);
+
+  return result;
+}, [weekData, selectedRange]);
+
+// Calculate Y-axis domain
+const yAxisDomain = useMemo(() => {
+  if (filteredData.length === 0) return [0, 100];
+
+  const values = filteredData
+    .map(item => {
+      const value = item[selectedContent];
+      console.log(`Extracted value for ${selectedContent}:`, value);
+      return value != null ? value : null;
+    })
+    .filter(val => val != null);
+
+  if (values.length === 0) return [0, 100];
+
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const tolerance = (max - min) * 0.2; // 20% padding
+
+  return [
+    Math.max(0, Math.floor(min - tolerance)),
+    Math.ceil(max + tolerance)
+  ];
+}, [filteredData, selectedContent]);
+
+// Get selected content's config (label, unit, color)
+const selectedContentConfig = contentOptions.find(
+  opt => opt.value === selectedContent
+);
+
+// Initial data fetching
+useEffect(() => {
+  fetchPatientData();
+  fetchTodaysReadings();
+  fetchWeekData();
+}, []);
+
+// Refetch when dropdowns change
+useEffect(() => {
+  if (!loading) {
+    fetchWeekData();
+  }
+}, [selectedRange, selectedContent]);
+
+>>>>>>> 72d41af3b6c07241ce1eb7b80908beacf29da9c7
 
   const cardBg = useColorModeValue('white', 'gray.800');
 

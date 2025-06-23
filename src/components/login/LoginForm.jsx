@@ -95,11 +95,11 @@ const LoginForm = () => {
       <form onSubmit={handleSubmit}>
         <VStack spacing={4} width='100%'>
           <FormControl>
-            <FormLabel>Email</FormLabel>
+            <FormLabel>Email or Mobile No.</FormLabel>
 
             <Input
-              type='email'
-              placeholder='Enter your email'
+              type='text'
+              placeholder='Enter your email or mobile no.'
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
