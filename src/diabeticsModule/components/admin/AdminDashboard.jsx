@@ -279,7 +279,7 @@ const AdminDashboard = () => {
             </TabPanel>
           </TabPanels>
         </Tabs>
-       </Box> 
+      </Box> 
     </Container>
   );
 };
