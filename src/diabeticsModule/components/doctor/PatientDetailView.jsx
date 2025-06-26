@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
+
 import {
   Box,
   Container,
@@ -29,6 +30,7 @@ import {
   TabPanels,
   Tab,
   TabPanel,
+  Select,
 } from '@chakra-ui/react';
 import { axiosInstance } from '../../api/config';
 import {
@@ -56,6 +58,8 @@ const PatientDetailView = ({ patientId }) => {
   const [loading, setLoading] = useState(true);
   const [readings, setReadings] = useState([]);
   const [chartData, setChartData] = useState([]);
+  const [selectedMetric, setSelectedMetric] = useState('bloodSugar');
+  const [selectedRange, setSelectedRange] = useState('2 weeks');
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -112,28 +116,196 @@ const PatientDetailView = ({ patientId }) => {
   }, [patientId]);
 
   // Process data for charts
-  const processChartData = (data) => {
-    if (!data || data.length === 0) return;
+ const processChartData = (data) => {
+  if (!data || data.length === 0) return;
 
-    // Sort by date
-    const sortedData = data.sort(
-      (a, b) => new Date(a.data.date) - new Date(b.data.date)
-    );
+  const formattedData = data.map((reading, index) => {
+    const { date, time, bloodSugar, carboLevel, insulin, session } = reading.data;
 
-    // Format for recharts
-    const formattedData = sortedData.map((reading) => ({
-      date: new Date(reading.data.date).toLocaleDateString(undefined, {
-        month: 'short',
-        day: 'numeric',
-      }),
-      bloodSugar: reading.data.bloodSugar,
-      carboLevel: reading.data.carboLevel,
-      insulin: reading.data.insulin,
-      session: reading.data.session,
-    }));
+    // Create a proper datetime string and parse it
+    const dateStr = date.split('T')[0];
+    const fullDateTimeStr = `${dateStr}T${time}:00`;
+    const parsedDate = new Date(fullDateTimeStr);
 
-    setChartData(formattedData);
-  };
+    return {
+      // Keep timestamp for filtering purposes
+      timestamp: parsedDate.getTime(),
+      // Keep the original date object for formatting
+      parsedDate,
+      // Format for display purposes
+      displayDateTime: format(parsedDate, 'MMM dd, hh:mm a'),
+      bloodSugar,
+      carboLevel,
+      insulin,
+      session,
+    };
+  });
+
+  // Sort by timestamp to ensure proper order
+  formattedData.sort((a, b) => a.timestamp - b.timestamp);
+  
+  setChartData(formattedData);
+};
+
+// Add this helper function to create evenly spaced data:
+
+const getEvenlySpacedData = (data) => {
+  if (!data || data.length === 0) return [];
+  
+  // Add sequential index to filtered data for even spacing
+  return data.map((item, index) => ({
+    ...item,
+    index: index
+  }));
+};
+  // Calculate start date from current date (today)
+// Replace your current getStartDate function with this improved version
+
+// Replace your current getStartDate function with this corrected version
+
+const getStartDate = (range) => {
+  const now = new Date();
+  // Set to start of today to include all of today's data
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  
+  switch (range) {
+    case '3 days': 
+      return new Date(today.getTime() - 3 * 24 * 60 * 60 * 1000);
+    case '1 week': 
+      return new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+    case '2 weeks': 
+      return new Date(today.getTime() - 14 * 24 * 60 * 60 * 1000);
+    case '1 month': 
+      // FIXED: Use proper month calculation instead of 30-day approximation
+      const oneMonthAgo = new Date(today);
+      oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+      return oneMonthAgo;
+    case 'all': 
+      return new Date(0); // Show all data
+    default: 
+      return new Date(today.getTime() - 14 * 24 * 60 * 60 * 1000);
+  }
+};
+
+// Alternative debugging version to help troubleshoot
+const getStartDateWithDebug = (range) => {
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  
+  let startDate;
+  
+  switch (range) {
+    case '3 days': 
+      startDate = new Date(today.getTime() - 3 * 24 * 60 * 60 * 1000);
+      break;
+    case '1 week': 
+      startDate = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+      break;
+    case '2 weeks': 
+      startDate = new Date(today.getTime() - 14 * 24 * 60 * 60 * 1000);
+      break;
+    case '1 month': 
+      // FIXED: Proper month calculation
+      startDate = new Date(today);
+      startDate.setMonth(startDate.getMonth() - 1);
+      // Handle edge case where current day doesn't exist in previous month
+      if (startDate.getMonth() === today.getMonth()) {
+        startDate.setDate(0); // Go to last day of previous month
+      }
+      break;
+    case 'all': 
+      startDate = new Date(0);
+      break;
+    default: 
+      startDate = new Date(today.getTime() - 14 * 24 * 60 * 60 * 1000);
+  }
+  
+  // Debug logging
+  console.log(`Date range calculation for "${range}":`);
+  console.log('Today:', today.toLocaleDateString());
+  console.log('Start date:', startDate.toLocaleDateString());
+  console.log('Days difference:', Math.ceil((today - startDate) / (1000 * 60 * 60 * 24)));
+  
+  return startDate;
+};
+
+// Additional helper function to check if your April dates fall within range
+const testDateRange = () => {
+  const today = new Date(); // Current date (June 18, 2025)
+  const startDate = new Date(today);
+  startDate.setMonth(startDate.getMonth() - 1); // Should be May 18, 2025
+  
+  const april26 = new Date('2025-04-26');
+  const april28 = new Date('2025-04-28');
+  
+  console.log('Testing date ranges:');
+  console.log('Today:', today.toLocaleDateString());
+  console.log('One month ago (start date):', startDate.toLocaleDateString());
+  console.log('April 26 in range:', april26 >= startDate && april26 <= today);
+  console.log('April 28 in range:', april28 >= startDate && april28 <= today);
+};
+
+// Call this function to test your date ranges
+// testDateRange();
+  // Filter data from current date backwards
+  const filteredData = useMemo(() => {
+  if (!chartData || chartData.length === 0) return [];
+  
+  let filtered;
+  
+  if (selectedRange === 'all') {
+    console.log('Showing all data, total entries:', chartData.length);
+    filtered = chartData;
+  } else {
+    const startDate = getStartDate(selectedRange);
+    const now = new Date();
+    
+    // Debug: Log filtering parameters
+    console.log('Filtering with:');
+    console.log('Selected range:', selectedRange);
+    console.log('Start date:', startDate.toLocaleString());
+    console.log('Current date:', now.toLocaleString());
+    console.log('Total data entries:', chartData.length);
+    
+    filtered = chartData.filter(entry => {
+      const entryDate = entry.parsedDate || new Date(entry.date);
+      const isInRange = entryDate >= startDate && entryDate <= now;
+      
+      // Debug: Log filtering for first few entries
+      if (chartData.indexOf(entry) < 5) {
+        console.log(`Entry ${chartData.indexOf(entry)}:`, 
+          entryDate.toLocaleString(), 
+          'In range:', isInRange);
+      }
+      
+      return isInRange;
+    });
+    
+    console.log('Filtered entries:', filtered.length);
+  }
+  
+  // Apply even spacing to the filtered data
+  return getEvenlySpacedData(filtered);
+}, [chartData, selectedRange]);
+
+  // Use filteredData for maxY calculation
+  const maxY = useMemo(() => {
+    if (!filteredData || filteredData.length === 0) return 100;
+    
+    if (selectedMetric === 'All') {
+      const allValues = filteredData.flatMap(entry => [
+        entry.bloodSugar,
+        entry.carboLevel,
+        entry.insulin
+      ]).filter(v => typeof v === 'number' && !isNaN(v));
+      const max = Math.max(...allValues, 0);
+      return Math.ceil(max * 1.2);
+    } else {
+      const values = filteredData.map(entry => entry[selectedMetric]).filter(v => typeof v === 'number' && !isNaN(v));
+      const max = Math.max(...values, 0);
+      return Math.ceil(max * 1.2);
+    }
+  }, [filteredData, selectedMetric]);
 
   if (loading) {
     return (
@@ -244,12 +416,250 @@ const PatientDetailView = ({ patientId }) => {
 
           <Tabs variant="enclosed" colorScheme="cyan">
             <TabList>
+              <Tab fontWeight="semibold">Health Trends</Tab>
               <Tab fontWeight="semibold">Patient Information</Tab>
               <Tab fontWeight="semibold">Medical Records</Tab>
-              <Tab fontWeight="semibold">Health Trends</Tab>
             </TabList>
 
             <TabPanels>
+               <TabPanel p={0} pt={4}>
+                <Card variant="outline">
+                  <CardHeader>
+                    <Heading size="md">
+                      <Flex align="center">
+                        <Icon as={FiBarChart2} mr={2} />
+                        Health Trends
+                      </Flex>
+                    </Heading>
+                  </CardHeader>
+                  <CardBody>
+                    {chartData.length > 0 ? (
+                      <Box h="400px">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <LineChart
+                            data={chartData}
+                            margin={{
+                              top: 5,
+                              right: 30,
+                              left: 20,
+                              bottom: 5,
+                            }}
+                          >
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis
+                              dataKey="date"
+                              tickFormatter={(date) =>
+                                format(new Date(date), 'MMM dd')
+                              }
+                            />
+                            <YAxis yAxisId="left" />
+                            <YAxis yAxisId="right" orientation="right" />
+                            <Tooltip
+                              labelFormatter={(date) =>
+                                format(new Date(date), 'MMM dd, yyyy')
+                              }
+                            />
+                            <Legend />
+                            <Line
+                              yAxisId="left"
+                              type="monotone"
+                              dataKey="bloodSugar"
+                              name="Blood Sugar"
+                              stroke="#5BA9B3"
+                              strokeWidth={2}
+                              dot={{ r: 4 }}
+                              activeDot={{ r: 6 }}
+                            />
+                            <Line
+                              yAxisId="left"
+                              type="monotone"
+                              dataKey="carboLevel"
+                              name="Carbs"
+                              stroke="#3B5998"
+                              strokeWidth={2}
+                              dot={{ r: 4 }}
+                              activeDot={{ r: 6 }}
+                            />
+                            <Line
+                              yAxisId="right"
+                              type="monotone"
+                              dataKey="insulin"
+                              name="Insulin"
+                              stroke="#FF8C00"
+                              strokeWidth={2}
+                              dot={{ r: 4 }}
+                              activeDot={{ r: 6 }}
+                            />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </Box>
+                    ) : (
+                      <Flex
+                        direction="column"
+                        align="center"
+                        justify="center"
+                        h="400px"
+                        bg="gray.50"
+                        borderRadius="md"
+                      >
+                        <Text color="gray.500">No readings available</Text>
+                      </Flex>
+                    )}
+                  </CardBody>
+                </Card>
+              </TabPanel>
+              <TabPanel p={0} pt={4}>
+                <Card variant="outline">
+                  <CardHeader>
+                    <Heading size="md">
+                      <Flex align="center" justify="space-between">
+                        <Flex align="center">
+                          <Icon as={FiBarChart2} mr={2} />
+                          Health Trends
+                        </Flex>
+                        <Flex gap={4}>
+                          <Select 
+                            size="md" 
+                            value={selectedMetric} 
+                            onChange={(e) => setSelectedMetric(e.target.value)}
+                            width="auto"
+                          >
+                            <option value="All">ALL</option>
+                            <option value="bloodSugar">Blood Sugar</option>
+                            <option value="carboLevel">Carbs</option>
+                            <option value="insulin">Insulin</option>
+                          </Select>
+                          <Select 
+                            size="md" 
+                            value={selectedRange} 
+                            onChange={(e) => setSelectedRange(e.target.value)}
+                            width="auto"
+                          >
+                            <option value="3 days">Past 3 Days</option>
+                            <option value="1 week">Past 1 Week</option>
+                            <option value="2 weeks">Past 2 Weeks</option>
+                            <option value="1 month">Past 1 Month</option>
+                            <option value="all">All Data</option>
+                          </Select>
+                        </Flex>
+                      </Flex>
+                    </Heading>
+                  </CardHeader>
+                  {/* console.log('ppdate',parsedDate); */}
+                  <CardBody>
+                    {filteredData.length > 0 ? (
+                      <Box h="400px">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <LineChart
+                            data={filteredData}
+                            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                          >
+                            
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis
+                              dataKey="index"
+                              type="number"
+                              domain={[0, filteredData.length - 1]}
+                              ticks={(() => {
+                                if (filteredData.length === 0) return [];
+                                
+                                const maxTicks = 12;
+                                const dataLength = filteredData.length;
+                                
+                                if (dataLength <= maxTicks) {
+                                  // If we have 12 or fewer points, show all
+                                  return filteredData.map(d => d.index);
+                                } else {
+                                  // Calculate evenly spaced indices
+                                  const ticks = [];
+                                  const step = (dataLength - 1) / (maxTicks - 1);
+                                  
+                                  for (let i = 0; i < maxTicks; i++) {
+                                    const tickIndex = Math.round(i * step);
+                                    ticks.push(tickIndex);
+                                  }
+                                  
+                                  return ticks;
+                                }
+                              })()}
+                              tickFormatter={(index) => {
+                                const dataPoint = filteredData.find(d => d.index === index);
+                                if (dataPoint) {
+                                  return format(dataPoint.parsedDate, 'MMM dd\nhh:mm a');
+                                }
+                                return '';
+                              }}
+                              angle={-45}
+                              textAnchor="end"
+                              height={80}
+                            />
+                            <YAxis
+                              domain={[0, maxY]}
+                              label={{ value: selectedMetric === 'All' ? 'Values' : selectedMetric, angle: -90, position: 'insideLeft' }}
+                            />
+                            <Tooltip
+                              labelFormatter={(index) => {
+                                const dataPoint = filteredData.find(d => d.index === index);
+                                if (dataPoint) {
+                                  return format(dataPoint.parsedDate, 'MMMM dd, yyyy - hh:mm a');
+                                }
+                                return '';
+                              }}
+                              formatter={(value, name) => [value, name]}
+                            />
+                            <Legend />
+                            {selectedMetric === 'All' ? (
+                              <>
+                                <Line
+                                  type="monotone"
+                                  dataKey="bloodSugar"
+                                  name="Blood Sugar"
+                                  stroke="#5BA9B3"
+                                  strokeWidth={2}
+                                  dot={{ r: 4 }}
+                                  activeDot={{ r: 6 }}
+                                />
+                                <Line
+                                  type="monotone"
+                                  dataKey="carboLevel"
+                                  name="Carbs"
+                                  stroke="#3B5998"
+                                  strokeWidth={2}
+                                  dot={{ r: 4 }}
+                                  activeDot={{ r: 6 }}
+                                />
+                                <Line
+                                  type="monotone"
+                                  dataKey="insulin"
+                                  name="Insulin"
+                                  stroke="#FF8C00"
+                                  strokeWidth={2}
+                                  dot={{ r: 4 }}
+                                  activeDot={{ r: 6 }}
+                                />
+                              </>
+                            ) : (
+                              <Line
+                                type="monotone"
+                                dataKey={selectedMetric}
+                                name={selectedMetric === 'bloodSugar' ? 'Blood Sugar' : selectedMetric === 'carboLevel' ? 'Carbs' : 'Insulin'}
+                                stroke={selectedMetric === 'bloodSugar' ? '#5BA9B3' : selectedMetric === 'carboLevel' ? '#3B5998' : '#FF8C00'}
+                                strokeWidth={2}
+                                dot={{ r: 4 }}
+                                activeDot={{ r: 6 }}
+                              />
+                            )}
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </Box>
+                    ) : (
+                      <Flex direction="column" align="center" justify="center" h="400px" bg="gray.50" borderRadius="md">
+                        <Text color="gray.500">No readings available for selected time range</Text>
+                      </Flex>
+                    )}
+                  </CardBody>
+                </Card>
+              </TabPanel>
               <TabPanel p={0} pt={4}>
                 <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
                   <Card variant="outline">
@@ -367,93 +777,6 @@ const PatientDetailView = ({ patientId }) => {
                     </CardBody>
                   </Card>
                 </SimpleGrid>
-              </TabPanel>
-
-              <TabPanel p={0} pt={4}>
-                <Card variant="outline">
-                  <CardHeader>
-                    <Heading size="md">
-                      <Flex align="center">
-                        <Icon as={FiBarChart2} mr={2} />
-                        Health Trends
-                      </Flex>
-                    </Heading>
-                  </CardHeader>
-                  <CardBody>
-                    {chartData.length > 0 ? (
-                      <Box h="400px">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <LineChart
-                            data={chartData}
-                            margin={{
-                              top: 5,
-                              right: 30,
-                              left: 20,
-                              bottom: 5,
-                            }}
-                          >
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis
-                              dataKey="date"
-                              tickFormatter={(date) =>
-                                format(new Date(date), 'MMM dd')
-                              }
-                            />
-                            <YAxis yAxisId="left" />
-                            <YAxis yAxisId="right" orientation="right" />
-                            <Tooltip
-                              labelFormatter={(date) =>
-                                format(new Date(date), 'MMM dd, yyyy')
-                              }
-                            />
-                            <Legend />
-                            <Line
-                              yAxisId="left"
-                              type="monotone"
-                              dataKey="bloodSugar"
-                              name="Blood Sugar"
-                              stroke="#5BA9B3"
-                              strokeWidth={2}
-                              dot={{ r: 4 }}
-                              activeDot={{ r: 6 }}
-                            />
-                            <Line
-                              yAxisId="left"
-                              type="monotone"
-                              dataKey="carboLevel"
-                              name="Carbs"
-                              stroke="#3B5998"
-                              strokeWidth={2}
-                              dot={{ r: 4 }}
-                              activeDot={{ r: 6 }}
-                            />
-                            <Line
-                              yAxisId="right"
-                              type="monotone"
-                              dataKey="insulin"
-                              name="Insulin"
-                              stroke="#FF8C00"
-                              strokeWidth={2}
-                              dot={{ r: 4 }}
-                              activeDot={{ r: 6 }}
-                            />
-                          </LineChart>
-                        </ResponsiveContainer>
-                      </Box>
-                    ) : (
-                      <Flex
-                        direction="column"
-                        align="center"
-                        justify="center"
-                        h="400px"
-                        bg="gray.50"
-                        borderRadius="md"
-                      >
-                        <Text color="gray.500">No readings available</Text>
-                      </Flex>
-                    )}
-                  </CardBody>
-                </Card>
               </TabPanel>
             </TabPanels>
           </Tabs>

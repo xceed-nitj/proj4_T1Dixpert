@@ -144,11 +144,11 @@ export default function DoctorDashboard() {
     if (!searchQuery) return true;
 
     const query = searchQuery.toLowerCase();
-    console.log(patient);
+    console.log("heyy",patient);
     return (
       patient.name.toLowerCase().includes(query) ||
       patient.contactNumber.includes(query) ||
-      patient.hospital.toLowerCase().includes(query)
+      patient.hospital?.name.toLowerCase().includes(query)
     );
   });
 
@@ -211,7 +211,7 @@ export default function DoctorDashboard() {
           value={stats.missingReadings}
           description="No recent data"
           icon={FiBarChart2}
-          color="cyan.300"
+          color="cyan.700"
         />
       </SimpleGrid>
 
