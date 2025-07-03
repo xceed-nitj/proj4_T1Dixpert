@@ -1,0 +1,12 @@
+[1mdiff --git a/clonetidepool/style.css b/clonetidepool/style.css[m
+[1mindex 407cca0..2bdda07 100644[m
+[1m--- a/clonetidepool/style.css[m
+[1m+++ b/clonetidepool/style.css[m
+[36m@@ -188,7 +188,6 @@[m [mhtml,body{[m
+ [m
+ .innertext{[m
+     border: 1px solid blue;[m
+[31m-    margin: 20px;[m
+ }[m
+ [m
+ #lowhead{[m
