@@ -63,6 +63,7 @@ import GamificationForm from './diabeticsModule/components/GamificationForm.jsx'
 import DoctorForm from './diabeticsModule/components/DoctorForm.jsx';
 
 // Diabetics Module Dashboards
+import WhatsAppAdminDashboard from './diabeticsModule/pages/WhatsAppAdminDashboard';
 import AdminDashboard from './diabeticsModule/pages/AdminDashboard';
 import PatientDashboard from './diabeticsModule/pages/PatientDashboard';
 import PatientHistory from './diabeticsModule/pages/PatientHistory';
@@ -120,6 +121,7 @@ function App() {
 
         {/* Admin Routes */}
         <Route path="/dm/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/dm/admin/whatsappdashboard" element={<WhatsAppAdminDashboard/>} />
 
         {/* Patient Routes */}
         <Route path="/dm/patient/dashboard" element={<PatientDashboard />} />

@@ -20,6 +20,7 @@ import {
   FiActivity,
   FiLogOut,
 } from 'react-icons/fi';
+import { FaWhatsapp } from "react-icons/fa";
 import { Link } from 'react-router-dom';
 import getEnvironment from '../../getenvironment';
 import { axiosInstance } from '../api/config';
@@ -80,6 +81,8 @@ const DMNavbar = () => {
         { name: 'Add Hospital', path: '/dm/addHospital', icon: FiUsers },
         { name: 'Add Doctor', path: '/dm/addDoctor', icon: FiUser },
         { name: 'Add Patient', path: '/dm/addPatient', icon: FiUser },
+        { name: 'Whatsapp Manager', path: '/dm/admin/whatsappdashboard', icon: FaWhatsapp },
+
       ];
     }
 
