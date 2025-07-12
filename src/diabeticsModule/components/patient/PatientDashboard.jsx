@@ -33,15 +33,15 @@ import {
 } from 'react-icons/fi';
 import { Link as RouterLink } from 'react-router-dom';
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from 'recharts';
+  Chart as ChartJS,
+  LineElement,
+  PointElement,
+  LinearScale,
+  CategoryScale,
+  Tooltip as ChartTooltip,
+  Legend as ChartLegend,
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
 import DailyDosageForm from '../DailyDosageForm';
 import { getCurrentPatient } from '../../api/patientApi';
 import {
@@ -50,6 +50,9 @@ import {
 } from '../../api/dailyDosageApi';
 import { use } from 'react';
 import DailyEntryStatusBar from './DailyEntryStatusBar';
+
+// Register Chart.js components
+ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, ChartTooltip, ChartLegend);
 
 export default function PatientDashboard() {
   const [patient, setPatient] = useState(null);
@@ -63,7 +66,7 @@ export default function PatientDashboard() {
   const contentOptions = [
     { value: 'bloodSugar', label: 'Blood Sugar', color: '#5BA9B3', unit: 'mg/dL' },
     { value: 'carboLevel', label: 'Carbohydrates', color: '#3B5998', unit: 'g' },
-    { value: 'insulin', label: 'Insulin', color: '#FF8C00', unit: 'units' },
+    { value: 'insulin', label: 'Insulin', color: '#06402B', unit: 'units' },
     { value: 'longLastingInsulin', label: 'Long Lasting Insulin', color: '#805AD5', unit: 'units' },
   ];
 
@@ -225,16 +228,76 @@ const yAxisDomain = useMemo(() => {
   return domain;
 }, [generateCompleteDataset, selectedContent]);
 
-    const processedChartData = useMemo(() => {
+//   
+const processedChartData = useMemo(() => {
   if (generateCompleteDataset.length === 0) return [];
 
-  return generateCompleteDataset.map((point, index) => ({
-    ...point,
-    // Use actual value if has data, otherwise use 0 or very low value
-    [selectedContent]: point.hasData ? point[selectedContent] : 0,
-    // Keep original value for tooltip
-    originalValue: point.hasData ? point[selectedContent] : null,
-  }));
+  const dataCopy = generateCompleteDataset.map((point) => {
+    const value = point.hasData ? point[selectedContent] : null;
+
+    return {
+      ...point,
+      [selectedContent]: value,
+      redLineValue: value, // Start with actual values for data points
+      originalValue: value,
+    };
+  });
+
+  console.log('Before interpolation:', dataCopy.map(p => ({ date: p.dayOnly, hasData: p.hasData, value: p[selectedContent] })));
+
+  // Forward pass: fill gaps using previous values
+  for (let i = 1; i < dataCopy.length; i++) {
+    const currentPoint = dataCopy[i];
+    const prevPoint = dataCopy[i - 1];
+
+    if (!currentPoint.hasData && prevPoint.redLineValue !== null) {
+      currentPoint.redLineValue = prevPoint.redLineValue;
+    }
+  }
+
+  // Backward pass: fill remaining gaps using next values
+  for (let i = dataCopy.length - 2; i >= 0; i--) {
+    const currentPoint = dataCopy[i];
+    const nextPoint = dataCopy[i + 1];
+
+    if (!currentPoint.hasData && currentPoint.redLineValue === null && nextPoint.redLineValue !== null) {
+      currentPoint.redLineValue = nextPoint.redLineValue;
+    }
+  }
+
+  // Linear interpolation for gaps between two data points
+  for (let i = 0; i < dataCopy.length; i++) {
+    const point = dataCopy[i];
+
+    if (point.hasData) continue; // Skip actual data points
+
+    // Find previous and next data points (not just any points)
+    let prev = i - 1;
+    while (prev >= 0 && !dataCopy[prev].hasData) {
+      prev--;
+    }
+
+    let next = i + 1;
+    while (next < dataCopy.length && !dataCopy[next].hasData) {
+      next++;
+    }
+
+    // If we have both previous and next data points, interpolate
+    if (prev >= 0 && next < dataCopy.length) {
+      const steps = next - prev;
+      const currentStep = i - prev;
+      const prevValue = dataCopy[prev][selectedContent];
+      const nextValue = dataCopy[next][selectedContent];
+      
+      if (prevValue !== null && nextValue !== null) {
+        point.redLineValue = prevValue + ((nextValue - prevValue) * currentStep / steps);
+      }
+    }
+  }
+
+  console.log('After interpolation:', dataCopy.map(p => ({ date: p.dayOnly, hasData: p.hasData, redLineValue: p.redLineValue })));
+
+  return dataCopy;
 }, [generateCompleteDataset, selectedContent]);
 
 // Initial data fetching
@@ -403,6 +466,7 @@ useEffect(() => {
         bg={cardBg}
         boxShadow="md"
         mb={8}
+        w="100%"
       >
         <Heading as="h2" size="md" mb={4}>
           <Flex align="center">
@@ -474,117 +538,110 @@ useEffect(() => {
               selectedContent={selectedContent}
             />
             {generateCompleteDataset.length > 0 ? (
-  <Box h="400px">
-    <ResponsiveContainer width="100%" height="100%">
-      <LineChart
-        data={processedChartData} // CHANGED: Use generateCompleteDataset instead of filteredData
-        margin={{
-          top: 5,
-          right: 30,
-          left: 20,
-          bottom: 5,
-        }}
-      >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis
-          dataKey="dateTimeDisplay" 
-          tick={{ fontSize: 10 }} 
-          tickFormatter={(value, index) => {
-            if (selectedRange <= 7) {
-              return value;
-            } else if (selectedRange <= 14) {
-              return index % 2 === 0 ? value : '';
-            } else {
-              return index % 3 === 0 ? value : '';
+  <Box h="400px" w="100%">
+    <Line
+      data={{
+        labels: processedChartData.map((point) => point.dateTimeDisplay),
+        datasets: [
+         {
+  label: selectedContentConfig?.label || "Data",
+  data: processedChartData.map((point) =>
+    point.hasData ? point[selectedContent] : point.redLineValue ?? 0
+  ),
+  borderWidth: 3,
+  tension: 0.5,
+  pointRadius: 5,
+   pointBackgroundColor: processedChartData.map((point) =>
+              point.hasData ? (selectedContentConfig?.color || "#1E3A8A") : "rgba(243, 238, 238, 0)"
+            ),
+  pointBorderColor: "#fff",
+  spanGaps: true,
+  segment: {
+    borderColor: ctx => {
+      const index = ctx.p0DataIndex;
+      const current = processedChartData[index];
+      const next = processedChartData[index + 1];
+
+      // if both current and next points have data, use green/blue color
+      if (current?.hasData && next?.hasData) {
+         return selectedContentConfig?.color || "#1E3A8A";
+      }
+
+      return "#DC2626"; // Red for gap/interpolation
+    },
+    borderWidth: 3,
+    borderDash: () => [0,0],
+  },
+}
+        ],
+      }}
+      options={{
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { 
+            display: true, 
+            labels: {
+        color: "#1E3A8A",         // Label text color
+        boxWidth: 20,             // Width of the legend box
+        boxHeight: 12,            // Height of the legend box (Chart.js v4+)
+        padding: 16,              // Space between entries
+        usePointStyle: true,      // Makes box a circle/triangle if pointStyle is set
+        font: {
+          size: 13,
+          weight: 'bold',
+          family: 'Arial',
+        }
+      },
+            position: 'bottom'
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const value = context.parsed.y;
+                const dataPoint = processedChartData[context.dataIndex];
+                
+                if (!dataPoint.hasData) {
+                  return null;
+                }
+                return `${context.dataset.label}: ${value ?? "No data"} ${selectedContentConfig?.unit}`;
+              }
             }
-          }}
-          angle={-45}
-          textAnchor="end"
-          height={100} 
-          interval={0} 
-        />
-        <YAxis 
-          domain={yAxisDomain} 
-          label={{
-            value: `${selectedContentConfig?.label} (${selectedContentConfig?.unit})`,
-            angle: -90,
-            position: 'insideLeft',
-            offset: 10,
-            style: { textAnchor: 'middle', fill: '#666', fontSize: 17 },
-          }}
-        />
-        <Tooltip
-          labelFormatter={(value) => {
-            return value;
-          }}
-          formatter={(value, name, props) => {
-            if (!props.payload.hasData) {
-              return ['No data', 'status'];
+          }
+        },
+        scales: {
+          x: {
+            ticks: {
+              maxRotation: 45,
+              minRotation: 45,
+              font: { size: 10 },
+              callback: function(value, index, ticks) {
+                if (selectedRange <= 7) return this.getLabelForValue(value);
+                if (selectedRange <= 14) return index % 2 === 0 ? this.getLabelForValue(value) : '';
+                return index % 3 === 0 ? this.getLabelForValue(value) : '';
+              }
+            },
+            title: {
+              display: true,
+              text: 'Date',
+              font: { size: 14 }
             }
-            return [
-              `${!props.payload.originalValue} ${selectedContentConfig?.unit}`,
-              selectedContentConfig?.label,
-            ];
-          }}
-        />
-        
-        <Legend />
-                <Line
-          type="monotone"
-          dataKey={selectedContent}
-          name={selectedContentConfig?.label}
-          stroke={selectedContentConfig?.color || "#3B82F6"}
-          strokeWidth={2}
-          connectNulls={true} // Connect all points to create single continuous line
-          dot={(props) => {
-            const { payload, cx, cy } = props;
-            if (!payload) return null;
-            
-            if (payload.hasData) {
-              // Normal data point - filled circle
-              return (
-                <circle 
-                  cx={cx} 
-                  cy={cy} 
-                  r={4} 
-                  fill={selectedContentConfig?.color || "#3B82F6"}
-                  stroke="white"
-                  strokeWidth={2}
-                />
-              );
-            } else {
-              // No data point - hollow circle with "X" mark
-              return (
-                <g>
-                  <circle 
-                    cx={cx} 
-                    cy={cy} 
-                    r={6} 
-                    fill="white"
-                    stroke="#EF4444"
-                    strokeWidth={2}
-                  />
-                  {/* X mark to indicate no data */}
-                  <g stroke="#EF4444" strokeWidth={2}>
-                    <line x1={cx-3} y1={cy-3} x2={cx+3} y2={cy+3} />
-                    <line x1={cx-3} y1={cy+3} x2={cx+3} y2={cy-3} />
-                  </g>
-                </g>
-              );
+          },
+          y: {
+            beginAtZero: true,
+            min: yAxisDomain[0],
+            max: yAxisDomain[1],
+            title: {
+              display: true,
+              text: `${selectedContentConfig?.label} (${selectedContentConfig?.unit})`,
+              font: { size: 17 }
             }
-          }}
-          activeDot={{ 
-            r: 6, 
-            stroke: selectedContentConfig?.color || "#3B82F6", 
-            strokeWidth: 2, 
-            fill: 'white' 
-          }}
-        />
-      </LineChart>
-    </ResponsiveContainer>
+          }
+        }
+      }}
+    />
   </Box>
 ) : (
-  // UPDATED: Better no-data message
   <Flex
     direction="column"
     align="center"
