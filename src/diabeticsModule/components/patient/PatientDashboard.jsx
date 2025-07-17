@@ -50,6 +50,7 @@ import {
 } from '../../api/dailyDosageApi';
 import { use } from 'react';
 import DailyEntryStatusBar from './DailyEntryStatusBar';
+// import MilestoneProgressBar from './Milestone'; 
 
 // Register Chart.js components
 ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, ChartTooltip, ChartLegend);
@@ -172,7 +173,7 @@ const generateCompleteDataset = useMemo(() => {
       dayEntries.forEach(entry => {
         completeDataset.push({
           ...entry,
-         dateTimeDisplay: `${format(day, 'MMM dd')} ${entry.time || ''}`,
+          dateTimeDisplay: `${format(day, 'MMM dd')} ${entry.time || ''}`,
           dayOnly: format(day, 'MMM dd'),
           sortKey: `${dayStr} ${entry.time || '00:00'}`,
           hasData: true
