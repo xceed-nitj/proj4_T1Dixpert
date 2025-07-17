@@ -20,6 +20,7 @@ import {
   UserPlusIcon,
   BuildingOfficeIcon,
 } from '@heroicons/react/24/outline';
+import { axiosInstance } from '../../api/config';
 import React, { useEffect, useState } from 'react';
 import StatCard from '../common/StatCard';
 import {
@@ -126,12 +127,10 @@ const WhatsAppAdminDashboard = () => {
     const fetchMockData = async () => {
       setLoading(true);
       await new Promise((res) => setTimeout(res, 500));
-      setStats({
-        usersCount: 122,
-        templatesCount: 34,
-        conversationsToday: 86,
-        messagesSent: 432,
-      });
+      const res = await axiosInstance.get('/diabeticsModule/chat/stats');
+      console.log("API response:", res.data);
+      setStats(res.data);
+
       setContacts([
         { _id: '1', name: 'Alice', number: '+919876543210' },
         { _id: '2', name: 'Bob', number: '+919123456789' },
