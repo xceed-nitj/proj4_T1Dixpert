@@ -18,6 +18,20 @@ import {
   Text,
   VStack,
   useColorModeValue,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
+  FormControl,
+  FormLabel,
+  Input,
+  Select,
+  useToast,
+  IconButton,
 } from '@chakra-ui/react';
 import { format, eachDayOfInterval } from 'date-fns';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -30,6 +44,7 @@ import {
   FiPieChart,
   FiPlus,
   FiZap,
+  FiEdit2,
 } from 'react-icons/fi';
 import { Link as RouterLink } from 'react-router-dom';
 import {
@@ -47,6 +62,7 @@ import { getCurrentPatient } from '../../api/patientApi';
 import {
   getPatientDailyDosageByDate,
   getPatientDailyDosageByRange,
+  updateDailyDosage, // You'll need to create this API function
 } from '../../api/dailyDosageApi';
 import { use } from 'react';
 import DailyEntryStatusBar from './DailyEntryStatusBar';
@@ -59,6 +75,21 @@ export default function PatientDashboard() {
   const [loading, setLoading] = useState(true);
   const [selectedContent, setSelectedContent] = useState('bloodSugar');
   const [selectedRange, setSelectedRange] = useState(14);
+  
+  // Edit modal states
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [editingReading, setEditingReading] = useState(null);
+  const [editForm, setEditForm] = useState({
+    bloodSugar: '',
+    carboLevel: '',
+    insulin: '',
+    longLastingInsulin: '',
+    session: '',
+    time: '',
+  });
+  const [isUpdating, setIsUpdating] = useState(false);
+  
+  const toast = useToast();
 
   // Add these configuration arrays
   const contentOptions = [
@@ -74,76 +105,178 @@ export default function PatientDashboard() {
     { value: 14, label: '2 Weeks' },
     { value: 30, label: '1 Month' },
   ];
+
+  const sessionOptions = [
+    'Pre-Breakfast',
+    'Pre-Lunch',
+    'Pre-Dinner',
+    'Night',
+  ];
+
   // Get current patient info
   const fetchPatientData = async () => {
     try {
       const data = await getCurrentPatient();
+      // console.log("DATA MIL GYA HAI",data);
       setPatient(data);
     } catch (error) {
       console.error('Error fetching patient data:', error);
     }
   };
-
   // Get today's readings
   const fetchTodaysReadings = async () => {
     try {
       const today = new Date().toISOString().split('T')[0];
       const data = await getPatientDailyDosageByDate(today);
       // Extract the data from the nested structure
-      const readings = data.map((reading) => reading.data);
+      const readings = data.map((reading) => ({
+        ...(reading.data ?? reading),
+        _id: reading._id,
+      }));
       setTodaysReadings(readings || []);
     } catch (error) {
       console.error("Error fetching today's readings:", error);
     }
   };
-const fetchWeekData = async () => {
-  try {
-    console.log('Fetching week data for range:', selectedRange);
-    
-    // Fix date calculation - ensure we get full days
-    const endDate = new Date();
-    endDate.setHours(23, 59, 59, 999); // End of today
-    
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - (selectedRange - 1));
-    startDate.setHours(0, 0, 0, 0); // Start of the day
-    
-    console.log('Date Range:', {
-      start: startDate.toISOString(),
-      end: endDate.toISOString(),
-      startFormatted: startDate.toLocaleDateString(),
-      endFormatted: endDate.toLocaleDateString()
-    });
-    
-    const data = await getPatientDailyDosageByRange(
-      startDate.toISOString(),
-      endDate.toISOString()
-    );
-    
-    console.log('API returned data:', data);
-    console.log('Data length:', data?.length);
-    
-    if (data && data.length > 0) {
-      // Flatten the data arrays from all items
-      const allReadings = data.flatMap((item) => {
-        console.log('Processing item:', item);
-        console.log('Item data length:', item.data?.length);
-        return item.data || [];
+
+  const fetchWeekData = async () => {
+    try {
+      console.log('Fetching week data for range:', selectedRange);
+      
+      // Fix date calculation - ensure we get full days
+      const endDate = new Date();
+      endDate.setHours(23, 59, 59, 999); // End of today
+      
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - (selectedRange - 1));
+      startDate.setHours(0, 0, 0, 0); // Start of the day
+      
+      console.log('Date Range:', {
+        start: startDate.toISOString(),
+        end: endDate.toISOString(),
+        startFormatted: startDate.toLocaleDateString(),
+        endFormatted: endDate.toLocaleDateString()
       });
       
-      console.log('All flattened readings:', allReadings);
-      console.log('Total readings count:', allReadings.length);
-      setWeekData(allReadings);
-    } else {
+      const data = await getPatientDailyDosageByRange(
+        startDate.toISOString(),
+        endDate.toISOString()
+      );
+      
+      console.log('API returned data:', data);
+      console.log('Data length:', data?.length);
+      
+      if (data && data.length > 0) {
+        // Flatten the data arrays from all items
+        const allReadings = data.flatMap((item) => {
+          console.log('Processing item:', item);
+          console.log('Item data length:', item.data?.length);
+          return item.data || [];
+        });
+        
+        console.log('All flattened readings:', allReadings);
+        console.log('Total readings count:', allReadings.length);
+        setWeekData(allReadings);
+      } else {
+        setWeekData([]);
+      }
+    } catch (error) {
+      console.error('Error fetching week data:', error);
       setWeekData([]);
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error('Error fetching week data:', error);
-    setWeekData([]);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
+
+  // Handle edit button click
+  const handleEditClick = (reading) => {
+    setEditingReading(reading);
+    console.log("heyy",reading);
+
+    const readingData = reading.data || reading;
+
+    setEditForm({
+      bloodSugar: readingData.bloodSugar ?.toString() || '',
+      carboLevel: readingData.carboLevel ?.toString() || '',
+      insulin: readingData.insulin ?.toString() || '',
+      longLastingInsulin: readingData.longLastingInsulin ?.toString() || '',
+      session: readingData.session || '',
+      time: readingData.time || '',
+    });
+    onOpen();
+  };
+
+  // Handle form input changes
+  const handleInputChange = (field, value) => {
+    setEditForm(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  // Handle update submission
+  const handleUpdateReading = async () => {
+    if (!editingReading) return;
+
+    setIsUpdating(true);
+    try {
+
+      const updateData = {
+        // Include the original date if it exists, otherwise use today's date
+        date: editingReading.date || new Date().toISOString().split('T')[0],
+        time: editForm.time,
+        session: editForm.session.toLowerCase().replace(/\s+/g, '-'), // Convert to enum format
+        bloodSugar: editForm.bloodSugar ? Number(editForm.bloodSugar) : undefined,
+        carboLevel: editForm.carboLevel ? Number(editForm.carboLevel) : undefined,
+        insulin: editForm.insulin ? Number(editForm.insulin) : undefined,
+        longLastingInsulin: editForm.longLastingInsulin ? Number(editForm.longLastingInsulin) : undefined,
+      };
+
+      Object.keys(updateData).forEach(key => {
+        if (updateData[key] === undefined || updateData[key] === '') {
+          delete updateData[key];
+        }
+      });
+
+      await updateDailyDosage(patient._id, editingReading._id,updateData);
+        
+      // Refresh data to ensure consistency
+      await Promise.all([
+        fetchTodaysReadings(),
+        fetchWeekData()
+      ]);
+
+      toast({
+        title: 'Reading updated successfully',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+      onClose();
+    } catch (error) {
+      console.error('Error updating reading:', error);
+      toast({
+        title: 'Error updating reading',
+        description: error.message || 'Something went wrong',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  // Filter the data for the selected range/content
+  const filteredData = useMemo(() => {
+    console.log('Filtering week data for range:', selectedRange);
+    console.log('Week Data:', weekData);
+
+    const result = weekData || [];
+    console.log('Filtered Data:', result);
+
+    return result;
+  }, [weekData, selectedRange]);
 
 const generateCompleteDataset = useMemo(() => {
   const endDate = new Date();
@@ -238,20 +371,19 @@ const yAxisDomain = useMemo(() => {
   }));
 }, [generateCompleteDataset, selectedContent]);
 
-// Initial data fetching
-useEffect(() => {
-  fetchPatientData();
-  fetchTodaysReadings();
-  fetchWeekData();
-}, []);
-
-// Refetch when dropdowns change
-useEffect(() => {
-  // Always fetch week data when selectedRange or selectedContent changes
-  fetchWeekData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [selectedRange, selectedContent]);
-
+  // Initial data fetching
+  useEffect(() => {
+    fetchPatientData();
+    fetchTodaysReadings();
+    fetchWeekData();
+  }, []);
+  
+  // Refetch when dropdowns change
+  useEffect(() => {
+    if (!loading) {
+      fetchWeekData();
+    }
+  }, [selectedRange, selectedContent]);
 
   const cardBg = useColorModeValue('white', 'gray.800');
 
@@ -265,6 +397,7 @@ useEffect(() => {
       </Flex>
     );
   }
+
   return (
     <Container maxW="container.xl" py={8}>
       <Flex justify="space-between" align="center" mb={8}>
@@ -306,15 +439,25 @@ useEffect(() => {
                 <Box key={index} p={3} borderWidth="1px" borderRadius="md">
                   <Flex justify="space-between" mb={2}>
                     <Badge colorScheme="blue">{reading.session}</Badge>
-                    <Text fontSize="sm" color="gray.500">
-                      {new Date(
-                        reading.createdAt || Date.now()
-                      ).toLocaleTimeString('en-CA', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: false,
-                      })}
-                    </Text>
+                    <HStack>
+                      <Text fontSize="sm" color="gray.500">
+                        {new Date(
+                          reading.createdAt || Date.now()
+                        ).toLocaleTimeString('en-CA', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: false,
+                        })}
+                      </Text>
+                      <IconButton
+                        aria-label="Edit reading"
+                        icon={<FiEdit2 />}
+                        size="sm"
+                        variant="ghost"
+                        colorScheme="blue"
+                        onClick={() => handleEditClick(reading)}
+                      />
+                    </HStack>
                   </Flex>
                   <SimpleGrid columns={3} spacing={4}>
                     <ReadingStat
@@ -649,6 +792,96 @@ useEffect(() => {
           </Flex>
         </VStack>
       </Box>
+
+      {/* Edit Reading Modal */}
+      <Modal isOpen={isOpen} onClose={onClose} size="lg">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Edit Reading</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <VStack spacing={4}>
+              <FormControl>
+                <FormLabel>Session</FormLabel>
+                <Select
+                  value={editForm.session}
+                  onChange={(e) => handleInputChange('session', e.target.value)}
+                >
+                  <option value="">Select Session</option>
+                  {sessionOptions.map((session) => (
+                    <option key={session} value={session}>
+                      {session}
+                    </option>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <FormControl>
+                <FormLabel>Time</FormLabel>
+                <Input
+                  type="time"
+                  value={editForm.time}
+                  onChange={(e) => handleInputChange('time', e.target.value)}
+                />
+              </FormControl>
+
+              <FormControl>
+                <FormLabel>Blood Sugar (mg/dL)</FormLabel>
+                <Input
+                  type="number"
+                  value={editForm.bloodSugar}
+                  onChange={(e) => handleInputChange('bloodSugar', e.target.value)}
+                  placeholder="Enter blood sugar level"
+                />
+              </FormControl>
+
+              <FormControl>
+                <FormLabel>Carbohydrate Level (g)</FormLabel>
+                <Input
+                  type="number"
+                  value={editForm.carboLevel}
+                  onChange={(e) => handleInputChange('carboLevel', e.target.value)}
+                  placeholder="Enter carbohydrate intake"
+                />
+              </FormControl>
+
+              <FormControl>
+                <FormLabel>Insulin (units)</FormLabel>
+                <Input
+                  type="number"
+                  value={editForm.insulin}
+                  onChange={(e) => handleInputChange('insulin', e.target.value)}
+                  placeholder="Enter insulin dosage"
+                />
+              </FormControl>
+
+              <FormControl>
+                <FormLabel>Long Lasting Insulin (units)</FormLabel>
+                <Input
+                  type="number"
+                  value={editForm.longLastingInsulin}
+                  onChange={(e) => handleInputChange('longLastingInsulin', e.target.value)}
+                  placeholder="Enter long lasting insulin dosage"
+                />
+              </FormControl>
+            </VStack>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button variant="ghost" mr={3} onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              colorScheme="blue"
+              onClick={handleUpdateReading}
+              isLoading={isUpdating}
+              loadingText="Updating..."
+            >
+              Update Reading
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Container>
   );
 }

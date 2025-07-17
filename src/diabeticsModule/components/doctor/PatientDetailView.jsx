@@ -422,87 +422,153 @@ const testDateRange = () => {
             </TabList>
 
             <TabPanels>
-               <TabPanel p={0} pt={4}>
+              <TabPanel p={0} pt={4}>
                 <Card variant="outline">
                   <CardHeader>
                     <Heading size="md">
-                      <Flex align="center">
-                        <Icon as={FiBarChart2} mr={2} />
-                        Health Trends
+                      <Flex align="center" justify="space-between">
+                        <Flex align="center">
+                          <Icon as={FiBarChart2} mr={2} />
+                          Health Trends
+                        </Flex>
+                        <Flex gap={4}>
+                          <Select 
+                            size="md" 
+                            value={selectedMetric} 
+                            onChange={(e) => setSelectedMetric(e.target.value)}
+                            width="auto"
+                          >
+                            <option value="All">ALL</option>
+                            <option value="bloodSugar">Blood Sugar</option>
+                            <option value="carboLevel">Carbs</option>
+                            <option value="insulin">Insulin</option>
+                          </Select>
+                          <Select 
+                            size="md" 
+                            value={selectedRange} 
+                            onChange={(e) => setSelectedRange(e.target.value)}
+                            width="auto"
+                          >
+                            <option value="3 days">Past 3 Days</option>
+                            <option value="1 week">Past 1 Week</option>
+                            <option value="2 weeks">Past 2 Weeks</option>
+                            <option value="1 month">Past 1 Month</option>
+                            <option value="all">All Data</option>
+                          </Select>
+                        </Flex>
                       </Flex>
                     </Heading>
                   </CardHeader>
+                  {/* console.log('ppdate',parsedDate); */}
                   <CardBody>
-                    {chartData.length > 0 ? (
+                    {filteredData.length > 0 ? (
                       <Box h="400px">
                         <ResponsiveContainer width="100%" height="100%">
                           <LineChart
-                            data={chartData}
-                            margin={{
-                              top: 5,
-                              right: 30,
-                              left: 20,
-                              bottom: 5,
-                            }}
+                            data={filteredData}
+                            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                           >
+                            
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis
-                              dataKey="date"
-                              tickFormatter={(date) =>
-                                format(new Date(date), 'MMM dd')
-                              }
+                              dataKey="index"
+                              type="number"
+                              domain={[0, filteredData.length - 1]}
+                              ticks={(() => {
+                                if (filteredData.length === 0) return [];
+                                
+                                const maxTicks = 12;
+                                const dataLength = filteredData.length;
+                                
+                                if (dataLength <= maxTicks) {
+                                  // If we have 12 or fewer points, show all
+                                  return filteredData.map(d => d.index);
+                                } else {
+                                  // Calculate evenly spaced indices
+                                  const ticks = [];
+                                  const step = (dataLength - 1) / (maxTicks - 1);
+                                  
+                                  for (let i = 0; i < maxTicks; i++) {
+                                    const tickIndex = Math.round(i * step);
+                                    ticks.push(tickIndex);
+                                  }
+                                  
+                                  return ticks;
+                                }
+                              })()}
+                              tickFormatter={(index) => {
+                                const dataPoint = filteredData.find(d => d.index === index);
+                                if (dataPoint) {
+                                  return format(dataPoint.parsedDate, 'MMM dd\nhh:mm a');
+                                }
+                                return '';
+                              }}
+                              angle={-45}
+                              textAnchor="end"
+                              height={80}
                             />
-                            <YAxis yAxisId="left" />
-                            <YAxis yAxisId="right" orientation="right" />
+                            <YAxis
+                              domain={[0, maxY]}
+                              label={{ value: selectedMetric === 'All' ? 'Values' : selectedMetric, angle: -90, position: 'insideLeft' }}
+                            />
                             <Tooltip
-                              labelFormatter={(date) =>
-                                format(new Date(date), 'MMM dd, yyyy')
-                              }
+                              labelFormatter={(index) => {
+                                const dataPoint = filteredData.find(d => d.index === index);
+                                if (dataPoint) {
+                                  return format(dataPoint.parsedDate, 'MMMM dd, yyyy - hh:mm a');
+                                }
+                                return '';
+                              }}
+                              formatter={(value, name) => [value, name]}
                             />
                             <Legend />
-                            <Line
-                              yAxisId="left"
-                              type="monotone"
-                              dataKey="bloodSugar"
-                              name="Blood Sugar"
-                              stroke="#5BA9B3"
-                              strokeWidth={2}
-                              dot={{ r: 4 }}
-                              activeDot={{ r: 6 }}
-                            />
-                            <Line
-                              yAxisId="left"
-                              type="monotone"
-                              dataKey="carboLevel"
-                              name="Carbs"
-                              stroke="#3B5998"
-                              strokeWidth={2}
-                              dot={{ r: 4 }}
-                              activeDot={{ r: 6 }}
-                            />
-                            <Line
-                              yAxisId="right"
-                              type="monotone"
-                              dataKey="insulin"
-                              name="Insulin"
-                              stroke="#FF8C00"
-                              strokeWidth={2}
-                              dot={{ r: 4 }}
-                              activeDot={{ r: 6 }}
-                            />
+                            {selectedMetric === 'All' ? (
+                              <>
+                                <Line
+                                  type="monotone"
+                                  dataKey="bloodSugar"
+                                  name="Blood Sugar"
+                                  stroke="#5BA9B3"
+                                  strokeWidth={2}
+                                  dot={{ r: 4 }}
+                                  activeDot={{ r: 6 }}
+                                />
+                                <Line
+                                  type="monotone"
+                                  dataKey="carboLevel"
+                                  name="Carbs"
+                                  stroke="#3B5998"
+                                  strokeWidth={2}
+                                  dot={{ r: 4 }}
+                                  activeDot={{ r: 6 }}
+                                />
+                                <Line
+                                  type="monotone"
+                                  dataKey="insulin"
+                                  name="Insulin"
+                                  stroke="#FF8C00"
+                                  strokeWidth={2}
+                                  dot={{ r: 4 }}
+                                  activeDot={{ r: 6 }}
+                                />
+                              </>
+                            ) : (
+                              <Line
+                                type="monotone"
+                                dataKey={selectedMetric}
+                                name={selectedMetric === 'bloodSugar' ? 'Blood Sugar' : selectedMetric === 'carboLevel' ? 'Carbs' : 'Insulin'}
+                                stroke={selectedMetric === 'bloodSugar' ? '#5BA9B3' : selectedMetric === 'carboLevel' ? '#3B5998' : '#FF8C00'}
+                                strokeWidth={2}
+                                dot={{ r: 4 }}
+                                activeDot={{ r: 6 }}
+                              />
+                            )}
                           </LineChart>
                         </ResponsiveContainer>
                       </Box>
                     ) : (
-                      <Flex
-                        direction="column"
-                        align="center"
-                        justify="center"
-                        h="400px"
-                        bg="gray.50"
-                        borderRadius="md"
-                      >
-                        <Text color="gray.500">No readings available</Text>
+                      <Flex direction="column" align="center" justify="center" h="400px" bg="gray.50" borderRadius="md">
+                        <Text color="gray.500">No readings available for selected time range</Text>
                       </Flex>
                     )}
                   </CardBody>

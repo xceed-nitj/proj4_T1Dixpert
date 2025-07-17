@@ -46,3 +46,25 @@ export const getPatientAllDosages = (patientId) =>
     .get(createEndpoint(`/dailyDosage/patient/${patientId}`))
     .then(handleApiResponse)
     .catch(handleApiError);
+
+//edit(put) the details
+export const updateDailyDosage = async (patientId, dosage_id, updateData) => 
+  {
+  // Ensure date is properly formatted
+  const formattedData = {
+    ...updateData,
+    date: updateData.date || new Date().toISOString().split('T')[0],
+    bloodSugar: updateData.bloodSugar ? Number(updateData.bloodSugar) : undefined,
+    carboLevel: updateData.carboLevel ? Number(updateData.carboLevel) : undefined,
+    insulin: updateData.insulin ? Number(updateData.insulin) : undefined,
+    longLastingInsulin: updateData.longLastingInsulin ? Number(updateData.longLastingInsulin) : undefined,
+  };
+
+  return axiosInstance
+    .put(createEndpoint(`/dailyDosage/patient/${patientId}`), {
+      _id: dosage_id,
+      data: formattedData,
+    })
+    .then(handleApiResponse)
+    .catch(handleApiError);
+};
