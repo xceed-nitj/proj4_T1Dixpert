@@ -51,6 +51,7 @@ import {
 import { use } from 'react';
 import DailyEntryStatusBar from './DailyEntryStatusBar';
 import MilestoneProgressBar from './Milestone'; 
+// import MilestoneProgressBar from './Milestone'; 
 
 // Register Chart.js components
 ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, ChartTooltip, ChartLegend);
@@ -544,7 +545,7 @@ useEffect(() => {
       data={{
         labels: processedChartData.map((point) => point.dateTimeDisplay),
         datasets: [
-         {
+        {
   label: selectedContentConfig?.label || "Data",
   data: processedChartData.map((point) =>
     point.hasData ? point[selectedContent] : point.redLineValue ?? 0
@@ -552,7 +553,7 @@ useEffect(() => {
   borderWidth: 3,
   tension: 0.5,
   pointRadius: 5,
-   pointBackgroundColor: processedChartData.map((point) =>
+  pointBackgroundColor: processedChartData.map((point) =>
               point.hasData ? (selectedContentConfig?.color || "#1E3A8A") : "rgba(243, 238, 238, 0)"
             ),
   pointBorderColor: "#fff",
@@ -565,7 +566,7 @@ useEffect(() => {
 
       // if both current and next points have data, use green/blue color
       if (current?.hasData && next?.hasData) {
-         return selectedContentConfig?.color || "#1E3A8A";
+        return selectedContentConfig?.color || "#1E3A8A";
       }
 
       return "#DC2626"; // Red for gap/interpolation
