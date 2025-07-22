@@ -50,7 +50,7 @@ import {
 } from '../../api/dailyDosageApi';
 import { use } from 'react';
 import DailyEntryStatusBar from './DailyEntryStatusBar';
-// import MilestoneProgressBar from './Milestone'; 
+import MilestoneProgressBar from './Milestone'; 
 
 // Register Chart.js components
 ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, ChartTooltip, ChartLegend);
@@ -343,7 +343,7 @@ useEffect(() => {
           View History
         </Button>
       </Flex>
-
+      <MilestoneProgressBar patient={patient}/>
       <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6} mb={8}>
         {/* Today's Status */}
         <Box
