@@ -37,6 +37,9 @@ function DailyDosageForm({ patientId, onSuccess }) {
       session: '',
       bloodSugar: '',
       carboLevel: '',
+      mealName: '',
+      mealQuantityNumber: '',
+      mealQuantityCategory: '',
       insulin: '',
       longLastingInsulin: '',
       physicalActivity: '',
@@ -111,6 +114,9 @@ function DailyDosageForm({ patientId, onSuccess }) {
           session: 'pre-breakfast',
           bloodSugar: '',
           carboLevel: '',
+          mealName: '',
+          mealQuantityNumber: '',
+          mealQuantityCategory: '',
           insulin: '',
           longLastingInsulin: '',
           physicalActivity: 'Low',
@@ -145,7 +151,7 @@ function DailyDosageForm({ patientId, onSuccess }) {
           </Heading>
         </Flex>
         <Text color="gray.600" fontSize="sm">
-          Record blood sugar levels, insulin doses, and other daily metrics for
+          Record blood sugar levels, meal information, insulin doses, and other daily metrics for
           diabetes management.
         </Text>
       </CardHeader>
@@ -234,6 +240,72 @@ function DailyDosageForm({ patientId, onSuccess }) {
                   />
                 </FormControl>
               </SimpleGrid>
+            </Box>
+
+            <Divider />
+
+            {/* Meal Information Section */}
+            <Box>
+              <Flex align="center" mb={4}>
+                <Icon as={FiActivity} mr={2} color="orange.500" />
+                <Text fontWeight="medium">Meal Information</Text>
+              </Flex>
+              <VStack spacing={6} align="stretch">
+                <FormControl>
+                  <FormLabel fontWeight="medium">Meal Name</FormLabel>
+                  <Input
+                    type="text"
+                    name="mealName"
+                    placeholder="e.g., Chicken Rice, Pizza, Oatmeal"
+                    value={dosageData.data.mealName}
+                    onChange={handleInputChange}
+                    size="md"
+                  />
+                </FormControl>
+
+                <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
+                  <FormControl>
+                    <FormLabel fontWeight="medium">Meal Quantity (portions)</FormLabel>
+                    <Select
+                      name="mealQuantityNumber"
+                      placeholder="Select number of portions"
+                      value={dosageData.data.mealQuantityNumber}
+                      onChange={handleInputChange}
+                      size="md"
+                    >
+                      <option value="0.25">1/4 portion</option>
+                      <option value="0.5">1/2 portion</option>
+                      <option value="0.75">3/4 portion</option>
+                      <option value="1">1 portion</option>
+                      <option value="1.25">1 1/4 portions</option>
+                      <option value="1.5">1 1/2 portions</option>
+                      <option value="1.75">1 3/4 portions</option>
+                      <option value="2">2 portions</option>
+                      <option value="2.5">2 1/2 portions</option>
+                      <option value="3">3 portions</option>
+                      <option value="3.5">3 1/2 portions</option>
+                      <option value="4">4 portions</option>
+                      <option value="4.5">4 1/2 portions</option>
+                      <option value="5">5 portions</option>
+                    </Select>
+                  </FormControl>
+
+                  <FormControl>
+                    <FormLabel fontWeight="medium">Meal Size Category</FormLabel>
+                    <Select
+                      name="mealQuantityCategory"
+                      placeholder="Select meal size"
+                      value={dosageData.data.mealQuantityCategory}
+                      onChange={handleInputChange}
+                      size="md"
+                    >
+                      <option value="Light">Light</option>
+                      <option value="Normal">Normal</option>
+                      <option value="Heavy">Heavy</option>
+                    </Select>
+                  </FormControl>
+                </SimpleGrid>
+              </VStack>
             </Box>
 
             <Divider />
