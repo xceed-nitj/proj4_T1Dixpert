@@ -82,13 +82,12 @@ const DailyEntryStatusBar = ({
       >
         {/* Days row */}
         <Flex gap={2} mb={2}>
-          {dailyStatus.map((day, dayIndex) => (
-            <Box key={day.date} flex="1">
+          {dailyStatus.map((day) => (
+            <Box key={day.date} flex="1" textAlign="center">
               <Text 
                 fontSize="xs" 
                 fontWeight="medium" 
                 color="gray.600" 
-                textAlign="center"
                 mb={1}
               >
                 {day.displayDate}
@@ -96,59 +95,61 @@ const DailyEntryStatusBar = ({
               <Text 
                 fontSize="xs" 
                 color="gray.500" 
-                textAlign="center"
-                mb={2}
               >
                 {day.dayOfWeek}
               </Text>
-              
-              {/* 4 segments for each day */}
-              <Flex gap={1}>
-                {day.segments.map((segment, segmentIndex) => (
-                  <Tooltip
-                    key={`${day.date}-${segment.key}`}
-                    label={`${day.displayDate} ${segment.label} (${segment.time}): ${
-                      segment.hasEntry ? 'Entry recorded' : 'No entry'
-                    }`}
-                    placement="top"
-                  >
-                    <Box
-                      flex="1"
-                      h="16px"
-                      bg={segment.hasEntry ? 'green.400' : 'red.400'}
-                      borderRadius="sm"
-                      cursor="pointer"
-                      transition="all 0.2s"
-                      _hover={{
-                        transform: 'translateY(-1px)',
-                        boxShadow: 'sm',
-                        bg: segment.hasEntry ? 'green.500' : 'red.500'
-                      }}
-                      position="relative"
-                    >
-                      {/* Today indicator on current day */}
-                      {format(new Date(), 'yyyy-MM-dd') === day.date && segmentIndex === 0 && (
-                        <Box
-                          position="absolute"
-                          top="-4px"
-                          left="-2px"
-                          w="4px"
-                          h="4px"
-                          bg="blue.500"
-                          borderRadius="full"
-                          border="1px solid white"
-                        />
-                      )}
-                    </Box>
-                  </Tooltip>
-                ))}
-              </Flex>
             </Box>
           ))}
         </Flex>
         
+        {/* Status bars in one continuous line */}
+        <Flex gap={2} mb={3}>
+          {dailyStatus.map((day, dayIndex) => (
+            <Flex key={day.date} gap={1} flex="1">
+              {day.segments.map((segment, segmentIndex) => (
+                <Tooltip
+                  key={`${day.date}-${segment.key}`}
+                  label={`${day.displayDate} ${segment.label} (${segment.time}): ${
+                    segment.hasEntry ? 'Entry recorded' : 'No entry'
+                  }`}
+                  placement="top"
+                >
+                  <Box
+                    flex="1"
+                    h="16px"
+                    bg={segment.hasEntry ? 'green.400' : 'red.400'}
+                    borderRadius="sm"
+                    cursor="pointer"
+                    transition="all 0.2s"
+                    _hover={{
+                      transform: 'translateY(-1px)',
+                      boxShadow: 'sm',
+                      bg: segment.hasEntry ? 'green.500' : 'red.500'
+                    }}
+                    position="relative"
+                  >
+                    {/* Today indicator on current day */}
+                    {format(new Date(), 'yyyy-MM-dd') === day.date && segmentIndex === 0 && (
+                      <Box
+                        position="absolute"
+                        top="-4px"
+                        left="-2px"
+                        w="4px"
+                        h="4px"
+                        bg="blue.500"
+                        borderRadius="full"
+                        border="1px solid white"
+                      />
+                    )}
+                  </Box>
+                </Tooltip>
+              ))}
+            </Flex>
+          ))}
+        </Flex>
+        
         {/* Time period labels */}
-        <Flex justify="center" gap={4} mt={3} pt={2} borderTop="1px solid" borderColor="gray.200">
+        <Flex justify="center" gap={4} pt={2} borderTop="1px solid" borderColor="gray.200">
           {timeSegments.map((segment) => (
             <Text key={segment.key} fontSize="xs" color="gray.500">
               {segment.label}
