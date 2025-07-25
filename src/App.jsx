@@ -3,6 +3,7 @@ import {
   Routes,
   Route,
   RouterProvider,
+  useLocation,
 } from 'react-router-dom';
 import Lottie from 'lottie-react';
 import Timetable from './timetableadmin/timetable';
@@ -48,6 +49,7 @@ import MasterLoadDataTable from './timetableadmin/viewinstituteloadmaster.jsx';
 import Departmentloadallocation from './timetableadmin/departmentloadallocation.jsx';
 
 import Home from './pages/Home';
+import NewHomePage from './pages/NewHomePage.jsx';
 import ErrorPage from './pages/ErrorPage.jsx';
 import animation404 from '../public/404.json';
 import { LogoAnimation } from './components/login/LogoAnimation.jsx';
@@ -76,18 +78,27 @@ import LoginPage from './diabeticsModule/pages/LoginPage';
 import DoctorDetailView from './diabeticsModule/pages/DoctorDetailView';
 import HospitalDetailView from './diabeticsModule/pages/HospitalDetailView';
 
+// NavbarWrapper component to conditionally render Navbar
+const NavbarWrapper = () => {
+  const location = useLocation();
+  // Don't show Navbar on the homepage route
+  if (location.pathname === '/') {
+    return null;
+  }
+  return <Navbar />;
+};
+
 function App() {
   return (
     <Router>
       {/* <div className="app"> */}
 
       {/* <h1>XCEED-Timetable Module</h1>  */}
-      <Navbar />
+      <NavbarWrapper />
 
       <Routes>
         {/* Landing Page */}
-        <Route path="/" element={<Login/>} />
-      
+        <Route path="/" element={<NewHomePage />} />
 
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />

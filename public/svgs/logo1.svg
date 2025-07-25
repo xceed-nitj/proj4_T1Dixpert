@@ -1,0 +1,30 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- 
+    IT1D Logo SVG 
+    Created based on the provided JPG image.
+    This SVG is scalable and can be used on the web.
+  -->
+  <defs>
+    <style>
+      .logo-blue { fill: #00539f; }
+      .logo-text {
+        font-family: Arial, sans-serif;
+        font-size: 60px;
+        font-weight: bold;
+        fill: #000000;
+      }
+    </style>
+  </defs>
+
+  <!-- Blue Circle Element -->
+  <circle cx="100" cy="100" r="95" class="logo-blue" />
+
+  <!-- White Inner Circle to create the ring effect -->
+  <circle cx="100" cy="100" r="80" fill="white" />
+
+  <!-- Blue Arc/Swoosh Element -->
+  <path d="M 40 150 A 85 85 0 0 1 160 150" stroke="#00539f" stroke-width="15" fill="none" stroke-linecap="round" />
+
+  <!-- Text "IT1D" -->
+  <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" class="logo-text">IT1D</text>
+</svg>
