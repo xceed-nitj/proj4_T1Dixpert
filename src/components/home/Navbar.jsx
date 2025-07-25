@@ -38,6 +38,7 @@ export default function Navbar() {
   }, [apiUrl]);
 
   const publicPaths = [
+    '/',
     '/forgot-password',
     '/nirf',
     '/login',
