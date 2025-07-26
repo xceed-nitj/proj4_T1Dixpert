@@ -33,7 +33,7 @@
     "eventsource": "^2.0.2",
     "file-saver": "^2.0.5",
     "formik": "^2.4.6",
-    "framer-motion": "^11.2.10",
+    "framer-motion": "^11.18.2",
     "html2canvas": "^1.4.1",
     "html2pdf.js": "^0.10.1",
     "jodit-react": "^4.0.15",
