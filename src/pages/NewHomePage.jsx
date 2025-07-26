@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 
 import logoImage1 from '../assets/logo.png'
 import logoImage2 from '../assets/pgilogo.jpeg'
