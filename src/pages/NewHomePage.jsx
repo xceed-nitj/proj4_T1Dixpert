@@ -28,6 +28,16 @@ export const NewHomePage = () => {
     '/hero-images/img6.jpg',
   ];
 
+  const dashBoardImages = [
+    '/Dashboard/dimg1.jpg',
+    '/Dashboard/dimg2.jpg',
+    '/Dashboard/dimg3.jpg',
+    '/Dashboard/dimg4.jpg',
+    '/Dashboard/dimg5.jpg',
+    '/Dashboard/dimg6.jpg',
+    '/Dashboard/dimg7.jpg'
+  ]
+
   // Check if the viewport is mobile
   useEffect(() => {
     const checkIsMobile = () => {
@@ -311,8 +321,8 @@ export const NewHomePage = () => {
       </section>
 
       {/* How T1Dixpert Platform Works Section */}
-      <section className="tw-py-8 md:tw-py-14 tw-px-2 md:tw-px-0 tw-bg-white">
-        <div className="tw-container tw-mx-auto">
+      <section className="tw-py-8 md:tw-py-14 tw-px-4 sm:tw-px-6 lg:tw-px-8 tw-bg-white">
+        <div className="tw-container tw-mx-auto tw-px-4 sm:tw-px-6 lg:tw-px-8">
           <motion.div 
             className="tw-text-center tw-mb-6 md:tw-mb-8"
             initial={{ opacity: 0, y: 30 }}
@@ -327,66 +337,119 @@ export const NewHomePage = () => {
               A modern, data-driven platform for Type 1 Diabetes care.
             </p>
           </motion.div>
-          <div className="tw-grid tw-grid-cols-1 lg:tw-grid-cols-2 tw-gap-4 md:tw-gap-8 tw-items-center">
+          <div className="tw-grid tw-grid-cols-1 lg:tw-grid-cols-2 tw-gap-6 md:tw-gap-8 lg:tw-gap-12 tw-items-center">
             <motion.div 
-              className="tw-space-y-4 md:tw-space-y-6"
+              className="tw-space-y-2 md:tw-space-y-3 lg:tw-space-y-4"
               initial={{ opacity: 0, x: -50 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
               viewport={{ once: true }}
             >
               <motion.div 
-                className="tw-bg-gradient-to-r tw-from-blue-50 tw-to-indigo-50 tw-p-4 md:tw-p-6 tw-rounded-lg tw-border tw-border-blue-100"
+                className="tw-bg-gradient-to-r tw-from-blue-50 tw-to-indigo-50 tw-p-2 md:tw-p-3 lg:tw-p-4 tw-rounded-lg tw-border tw-border-blue-100"
                 whileHover={{ scale: 1.02, y: -2 }}
                 transition={{ duration: 0.2 }}
               >
-                <h3 className="tw-text-base md:tw-text-lg tw-font-semibold tw-text-gray-800 tw-mb-1">Admin Dashboard</h3>
-                <p className="tw-text-xs md:tw-text-sm tw-text-gray-600">
+                <h3 className="tw-text-sm md:tw-text-base tw-font-semibold tw-text-gray-800 tw-mb-1">Admin Dashboard</h3>
+                <p className="tw-text-[11px] md:tw-text-xs tw-text-gray-600">
                   Centralized control panel for managing users, monitoring platform activity, and overseeing system health.
                 </p>
               </motion.div>
               <motion.div 
-                className="tw-bg-gradient-to-r tw-from-purple-50 tw-to-pink-50 tw-p-4 md:tw-p-6 tw-rounded-lg tw-border tw-border-purple-100"
+                className="tw-bg-gradient-to-r tw-from-purple-50 tw-to-pink-50 tw-p-2 md:tw-p-3 lg:tw-p-4 tw-rounded-lg tw-border tw-border-purple-100"
                 whileHover={{ scale: 1.02, y: -2 }}
                 transition={{ duration: 0.2 }}
               >
-                <h3 className="tw-text-base md:tw-text-lg tw-font-semibold tw-text-gray-800 tw-mb-1">Doctors Dashboard</h3>
-                <p className="tw-text-xs md:tw-text-sm tw-text-gray-600">
+                <h3 className="tw-text-sm md:tw-text-base tw-font-semibold tw-text-gray-800 tw-mb-1">Doctors Dashboard</h3>
+                <p className="tw-text-[11px] md:tw-text-xs tw-text-gray-600">
                   Comprehensive interface for doctors to review patient data, provide recommendations, and track treatment progress.
                 </p>
               </motion.div>
               <motion.div 
-                className="tw-bg-gradient-to-r tw-from-green-50 tw-to-teal-50 tw-p-4 md:tw-p-6 tw-rounded-lg tw-border tw-border-green-100"
+                className="tw-bg-gradient-to-r tw-from-green-50 tw-to-teal-50 tw-p-2 md:tw-p-3 lg:tw-p-4 tw-rounded-lg tw-border tw-border-green-100"
                 whileHover={{ scale: 1.02, y: -2 }}
                 transition={{ duration: 0.2 }}
               >
-                <h3 className="tw-text-base md:tw-text-lg tw-font-semibold tw-text-gray-800 tw-mb-1">Patient Dashboard</h3>
-                <p className="tw-text-xs md:tw-text-sm tw-text-gray-600">
+                <h3 className="tw-text-sm md:tw-text-base tw-font-semibold tw-text-gray-800 tw-mb-1">Patient Dashboard</h3>
+                <p className="tw-text-[11px] md:tw-text-xs tw-text-gray-600">
                   Personalized dashboard for patients to monitor their health, receive insights, and communicate with healthcare providers.
                 </p>
               </motion.div>
             </motion.div>
             <motion.div 
-              className="tw-relative tw-overflow-hidden tw-rounded-lg tw-shadow md:tw-ml-4"
+              className="tw-relative tw-overflow-hidden tw-rounded-lg tw-shadow lg:tw-ml-6 xl:tw-ml-8"
               initial={{ opacity: 0, x: 50 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
               viewport={{ once: true }}
             >
-              <div className="tw-aspect-video tw-bg-gray-100 tw-flex tw-items-center tw-justify-center">
-                <video autoPlay loop muted src='/videos/vid1.mp4' className="tw-w-full tw-h-full tw-object-cover tw-rounded-lg"></video>
+              <div className="tw-aspect-video tw-bg-gray-100 tw-flex tw-items-center tw-justify-center tw-relative">
+                {dashBoardImages.map((image, index) => (
+                  <motion.div 
+                    key={index}
+                    className={`tw-absolute tw-inset-0 tw-transition-opacity tw-duration-1000 tw-ease-in-out ${index === currentImageIndex ? 'tw-opacity-100' : 'tw-opacity-0'}`}
+                    initial={{ opacity: 0, scale: 1.1 }}
+                    animate={{ opacity: index === currentImageIndex ? 1 : 0, scale: 1 }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                  >
+                    <img 
+                      src={image} 
+                      alt={`Dashboard ${index + 1}`} 
+                      className="tw-w-full tw-h-full tw-object-cover tw-rounded-lg"
+                    />
+                    <div className="tw-absolute tw-inset-0 tw-bg-gradient-to-t tw-from-black/20 tw-to-transparent"></div>
+                  </motion.div>
+                ))}
+                
+                {/* Navigation dots for dashboard slider */}
+                <div className="tw-absolute tw-bottom-4 tw-left-0 tw-right-0 tw-flex tw-justify-center tw-gap-2">
+                  {dashBoardImages.map((_, index) => (
+                    <motion.button
+                      key={index}
+                      onClick={() => setCurrentImageIndex(index)}
+                      className={`tw-w-6 tw-h-1 tw-transition-all tw-duration-300 ${index === currentImageIndex ? 'tw-bg-white' : 'tw-bg-white/40'}`}
+                      aria-label={`Go to dashboard ${index + 1}`}
+                      whileHover={{ scale: 1.2 }}
+                      whileTap={{ scale: 0.9 }}
+                    />
+                  ))}
+                </div>
+                
+                {/* Navigation arrows for dashboard slider */}
+                {!isMobile && (
+                  <>
+                    <button
+                      onClick={() => setCurrentImageIndex(prevIndex => (prevIndex - 1 + dashBoardImages.length) % dashBoardImages.length)}
+                      className="tw-absolute tw-left-4 tw-top-1/2 tw-transform tw--translate-y-1/2 tw-bg-white/30 tw-backdrop-blur-sm tw-w-8 tw-h-8 md:tw-w-10 md:tw-h-10 tw-rounded-full tw-flex tw-items-center tw-justify-center tw-text-white hover:tw-bg-white/50 tw-transition-all"
+                      aria-label="Previous dashboard"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="tw-h-4 tw-w-4 md:tw-h-6 md:tw-w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => setCurrentImageIndex(prevIndex => (prevIndex + 1) % dashBoardImages.length)}
+                      className="tw-absolute tw-right-4 tw-top-1/2 tw-transform tw--translate-y-1/2 tw-bg-white/30 tw-backdrop-blur-sm tw-w-8 tw-h-8 md:tw-w-10 md:tw-h-10 tw-rounded-full tw-flex tw-items-center tw-justify-center tw-text-white hover:tw-bg-white/50 tw-transition-all"
+                      aria-label="Next dashboard"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="tw-h-4 tw-w-4 md:tw-h-6 md:tw-w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  </>
+                )}
               </div>
             </motion.div>
           </div>
           <motion.div 
-            className="tw-grid tw-grid-cols-1 md:tw-grid-cols-3 tw-gap-4 md:tw-gap-8 tw-mt-8 md:tw-mt-12"
+            className="tw-grid tw-grid-cols-1 md:tw-grid-cols-3 tw-gap-6 md:tw-gap-8 lg:tw-gap-12 tw-mt-8 md:tw-mt-12 lg:tw-mt-16"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
             viewport={{ once: true }}
           >
             <motion.div 
-              className="tw-text-left tw-p-4 tw-bg-white tw-rounded-lg tw-shadow tw-border tw-border-gray-100 hover:tw-shadow-md tw-transition-all"
+              className="tw-text-left tw-p-4 md:tw-p-6 tw-bg-white tw-rounded-lg tw-shadow tw-border tw-border-gray-100 hover:tw-shadow-md tw-transition-all"
               whileHover={{ scale: 1.05, y: -5 }}
               transition={{ duration: 0.2 }}
             >
@@ -403,7 +466,7 @@ export const NewHomePage = () => {
               <p className="tw-text-xs md:tw-text-xs tw-text-gray-600">Care plans tailored to your unique needs.</p>
             </motion.div>
             <motion.div 
-              className="tw-text-left tw-p-4 tw-bg-white tw-rounded-lg tw-shadow tw-border tw-border-gray-100 hover:tw-shadow-md tw-transition-all"
+              className="tw-text-left tw-p-4 md:tw-p-6 tw-bg-white tw-rounded-lg tw-shadow tw-border tw-border-gray-100 hover:tw-shadow-md tw-transition-all"
               whileHover={{ scale: 1.05, y: -5 }}
               transition={{ duration: 0.2 }}
             >
@@ -420,7 +483,7 @@ export const NewHomePage = () => {
               <p className="tw-text-xs md:tw-text-xs tw-text-gray-600">Instant notifications for critical events.</p>
             </motion.div>
             <motion.div 
-              className="tw-text-left tw-p-4 tw-bg-white tw-rounded-lg tw-shadow tw-border tw-border-gray-100 hover:tw-shadow-md tw-transition-all"
+              className="tw-text-left tw-p-4 md:tw-p-6 tw-bg-white tw-rounded-lg tw-shadow tw-border tw-border-gray-100 hover:tw-shadow-md tw-transition-all"
               whileHover={{ scale: 1.05, y: -5 }}
               transition={{ duration: 0.2 }}
             >
