@@ -8,6 +8,7 @@ import ResponsiveGraph from '../components/HomePage/ResponsiveGraph';
 import InteractiveGraph from '../components/HomePage/InteractiveGraph';
 import BarGraph from '../components/HomePage/barGraph';
 import BarGraphResponsive from '../components/HomePage/barGraphResponsive';
+import { motion } from 'framer-motion';
 
 import { teamDetailsNITJ, teamDetailsPGIMER, platformFeatures, t1dStatistics, teamMembers  } from './data.jsx';
 
@@ -117,20 +118,11 @@ export const NewHomePage = () => {
                 transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
               >
                 <motion.button 
-                  onClick={() => window.location.href = '/login'} 
                   className="tw-bg-[#627CFF] hover:tw-bg-blue-700 tw-text-white tw-px-6 tw-py-2 md:tw-py-3 tw-rounded tw-font-medium tw-transition-all tw-text-sm md:tw-text-base"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  Get Started
-                </motion.button>
-                <motion.button 
-                  onClick={() => window.location.href = '#statistics'} 
-                  className="tw-border tw-border-[#281946] tw-text-[#281946] hover:tw-bg-gray-100 tw-px-6 tw-py-2 md:tw-py-3 tw-rounded tw-font-medium tw-transition-all tw-text-sm md:tw-text-base"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Learn More
+                  Launching Soon
                 </motion.button>
               </motion.div>
             </motion.div>
