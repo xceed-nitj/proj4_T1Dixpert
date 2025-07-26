@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 import logoImage1 from '../assets/logo.png'
 import logoImage2 from '../assets/pgilogo.jpeg'
@@ -56,8 +57,13 @@ export const NewHomePage = () => {
       {/* Navbar Section */}
       <nav className="tw-bg-white/90 tw-backdrop-blur-sm tw-shadow-md tw-h-16 tw-px-6 tw-sticky tw-top-0 tw-z-50 flex items-center">
         <div className="tw-container tw-mx-auto tw-flex tw-justify-between tw-items-center tw-h-full">
-          <div className="tw-flex tw-items-center tw-h-full">
-            {/* Use a properly sized logo, adjust src as needed */}
+          <div
+            className="tw-flex tw-items-center tw-h-full tw-cursor-pointer"
+            onClick={() => {
+              window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+            }}
+            title="Go to Top"
+          >
             <img 
               src="/dm/it1d-logo-c.png" 
               alt="iT1Dxpert Logo" 
@@ -82,31 +88,68 @@ export const NewHomePage = () => {
         <div className="tw-container tw-mx-auto tw-px-4 md:tw-px-6">
           <div className="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 tw-gap-8 md:tw-gap-12 tw-items-center">
             {/* Left Content */}
-            <div>
-              <h1 className="tw-text-3xl md:tw-text-5xl tw-font-bold tw-text-[#281946] tw-mb-4 md:tw-mb-6 tw-text-left">
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+            >
+              <motion.h1 
+                className="tw-text-3xl md:tw-text-5xl tw-font-bold tw-text-[#281946] tw-mb-4 md:tw-mb-6 tw-text-left"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+              >
                 T1Dixpert Diabetes Heroes
-              </h1>
-              <p className="tw-text-base md:tw-text-lg tw-text-gray-600 tw-mb-6 md:tw-mb-8 tw-max-w-lg tw-text-left">
+              </motion.h1>
+              <motion.p 
+                className="tw-text-base md:tw-text-lg tw-text-gray-600 tw-mb-6 md:tw-mb-8 tw-max-w-lg tw-text-left"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+              >
                 Everyone loves a good hero story and we're inviting you to share yours.
                 Celebrate your diabetes hero with T1Dixpert, connecting patients, doctors, and
                 caregivers for improved health outcomes.
-              </p>
-              <div className="tw-flex tw-flex-wrap tw-gap-4">
-                <button className="tw-bg-[#627CFF] hover:tw-bg-blue-700 tw-text-white tw-px-6 tw-py-2 md:tw-py-3 tw-rounded tw-font-medium tw-transition-all tw-text-sm md:tw-text-base">
+              </motion.p>
+              <motion.div 
+                className="tw-flex tw-flex-wrap tw-gap-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
+              >
+                <motion.button 
+                  onClick={() => window.location.href = '/login'} 
+                  className="tw-bg-[#627CFF] hover:tw-bg-blue-700 tw-text-white tw-px-6 tw-py-2 md:tw-py-3 tw-rounded tw-font-medium tw-transition-all tw-text-sm md:tw-text-base"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
                   Get Started
-                </button>
-                <button className="tw-border tw-border-[#281946] tw-text-[#281946] hover:tw-bg-gray-100 tw-px-6 tw-py-2 md:tw-py-3 tw-rounded tw-font-medium tw-transition-all tw-text-sm md:tw-text-base">
+                </motion.button>
+                <motion.button 
+                  onClick={() => window.location.href = '#statistics'} 
+                  className="tw-border tw-border-[#281946] tw-text-[#281946] hover:tw-bg-gray-100 tw-px-6 tw-py-2 md:tw-py-3 tw-rounded tw-font-medium tw-transition-all tw-text-sm md:tw-text-base"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
                   Learn More
-                </button>
-              </div>
-            </div>
+                </motion.button>
+              </motion.div>
+            </motion.div>
             
             {/* Right Content - Minimal Image Slider */}
-            <div className="tw-relative tw-overflow-hidden tw-rounded-xl tw-shadow-xl tw-h-64 md:tw-h-96">
+            <motion.div 
+              className="tw-relative tw-overflow-hidden tw-rounded-xl tw-shadow-xl tw-h-64 md:tw-h-96"
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
+            >
               {heroImages.map((image, index) => (
-                <div 
+                <motion.div 
                   key={index}
                   className={`tw-absolute tw-inset-0 tw-transition-opacity tw-duration-1000 tw-ease-in-out ${index === currentImageIndex ? 'tw-opacity-100' : 'tw-opacity-0'}`}
+                  initial={{ opacity: 0, scale: 1.1 }}
+                  animate={{ opacity: index === currentImageIndex ? 1 : 0, scale: 1 }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
                 >
                   <img 
                     src={image} 
@@ -114,17 +157,19 @@ export const NewHomePage = () => {
                     className="tw-w-full tw-h-full tw-object-cover"
                   />
                   <div className="tw-absolute tw-inset-0 tw-bg-gradient-to-t tw-from-black/30 tw-to-transparent"></div>
-                </div>
+                </motion.div>
               ))}
               
               {/* Simple navigation controls */}
               <div className="tw-absolute tw-bottom-4 tw-left-0 tw-right-0 tw-flex tw-justify-center tw-gap-2">
                 {heroImages.map((_, index) => (
-                  <button
+                  <motion.button
                     key={index}
                     onClick={() => setCurrentImageIndex(index)}
                     className={`tw-w-6 tw-h-1 tw-transition-all tw-duration-300 ${index === currentImageIndex ? 'tw-bg-white' : 'tw-bg-white/40'}`}
                     aria-label={`Go to image ${index + 1}`}
+                    whileHover={{ scale: 1.2 }}
+                    whileTap={{ scale: 0.9 }}
                   />
                 ))}
               </div>
@@ -152,7 +197,7 @@ export const NewHomePage = () => {
                   </button>
                 </>
               )}
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -160,28 +205,46 @@ export const NewHomePage = () => {
       {/* Features Section */}
       <section id="features" className="tw-py-16 md:tw-py-24 tw-px-4 md:tw-px-6 tw-bg-gray-50">
         <div className="tw-container tw-mx-auto">
-          <div className="tw-text-center tw-mb-10 md:tw-mb-16">
+          <motion.div 
+            className="tw-text-center tw-mb-10 md:tw-mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            viewport={{ once: true }}
+          >
             <h2 className="tw-text-2xl md:tw-text-4xl tw-text-gray-800 tw-mb-3 md:tw-mb-4">Platform Features</h2>
             <p className="tw-text-sm md:tw-text-base tw-text-gray-600 tw-max-w-3xl tw-mx-auto">
               iT1Dixpert provides innovative tools specifically designed for effective Type 1 Diabetes management
             </p>
-          </div>
+          </motion.div>
           
-          <div className="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 tw-gap-8 md:tw-gap-16">
-            {/* Features List */}
-            <div className="tw-space-y-8 md:tw-space-y-12">
-              {platformFeatures.map((feature) => (
-                <div key={feature.id} className="tw-flex tw-gap-3 md:tw-gap-4">
-                  <div className="tw-shrink-0 tw-w-10 tw-h-10 md:tw-w-14 md:tw-h-14 tw-rounded-full tw-bg-blue-100 tw-flex tw-items-center tw-justify-center">
-                    <span className="tw-text-blue-600">{feature.icon}</span>
-                  </div>
-                  <div>
-                    <h3 className="tw-text-base md:tw-text-xl tw-font-medium tw-text-gray-800 tw-mb-1 md:tw-mb-2">{feature.title}</h3>
-                    <p className="tw-text-xs md:tw-text-base tw-text-gray-600">{feature.description}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+                      <div className="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 tw-gap-8 md:tw-gap-16">
+              {/* Features List */}
+              <div className="tw-space-y-8 md:tw-space-y-12">
+                {platformFeatures.map((feature, index) => (
+                  <motion.div 
+                    key={feature.id} 
+                    className="tw-flex tw-gap-3 md:tw-gap-4"
+                    initial={{ opacity: 0, x: -30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.6, delay: index * 0.1, ease: "easeOut" }}
+                    viewport={{ once: true }}
+                    whileHover={{ x: 5 }}
+                  >
+                    <motion.div 
+                      className="tw-shrink-0 tw-w-10 tw-h-10 md:tw-w-14 md:tw-h-14 tw-rounded-full tw-bg-blue-100 tw-flex tw-items-center tw-justify-center"
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <span className="tw-text-blue-600">{feature.icon}</span>
+                    </motion.div>
+                    <div>
+                      <h3 className="tw-text-base md:tw-text-xl tw-font-medium tw-text-gray-800 tw-mb-1 md:tw-mb-2">{feature.title}</h3>
+                      <p className="tw-text-xs md:tw-text-base tw-text-gray-600">{feature.description}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
             
             {/* Bar Graph - Responsive */}
             {/* Desktop: Show BarGraph, hidden on mobile */}
@@ -253,6 +316,136 @@ export const NewHomePage = () => {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* How T1Dixpert Platform Works Section */}
+      <section className="tw-py-8 md:tw-py-14 tw-px-2 md:tw-px-0 tw-bg-white">
+        <div className="tw-container tw-mx-auto">
+          <motion.div 
+            className="tw-text-center tw-mb-6 md:tw-mb-8"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            viewport={{ once: true }}
+          >
+            <h2 className="tw-text-2xl md:tw-text-3xl tw-text-gray-800 tw-mb-1 md:tw-mb-2 tw-font-semibold">
+              How T1Dixpert Works
+            </h2>
+            <p className="tw-text-xs md:tw-text-sm tw-text-gray-600 tw-max-w-lg tw-mx-auto">
+              A modern, data-driven platform for Type 1 Diabetes care.
+            </p>
+          </motion.div>
+          <div className="tw-grid tw-grid-cols-1 lg:tw-grid-cols-2 tw-gap-4 md:tw-gap-8 tw-items-center">
+            <motion.div 
+              className="tw-space-y-4 md:tw-space-y-6"
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              viewport={{ once: true }}
+            >
+              <motion.div 
+                className="tw-bg-gradient-to-r tw-from-blue-50 tw-to-indigo-50 tw-p-4 md:tw-p-6 tw-rounded-lg tw-border tw-border-blue-100"
+                whileHover={{ scale: 1.02, y: -2 }}
+                transition={{ duration: 0.2 }}
+              >
+                <h3 className="tw-text-base md:tw-text-lg tw-font-semibold tw-text-gray-800 tw-mb-1">Admin Dashboard</h3>
+                <p className="tw-text-xs md:tw-text-sm tw-text-gray-600">
+                  Centralized control panel for managing users, monitoring platform activity, and overseeing system health.
+                </p>
+              </motion.div>
+              <motion.div 
+                className="tw-bg-gradient-to-r tw-from-purple-50 tw-to-pink-50 tw-p-4 md:tw-p-6 tw-rounded-lg tw-border tw-border-purple-100"
+                whileHover={{ scale: 1.02, y: -2 }}
+                transition={{ duration: 0.2 }}
+              >
+                <h3 className="tw-text-base md:tw-text-lg tw-font-semibold tw-text-gray-800 tw-mb-1">Doctors Dashboard</h3>
+                <p className="tw-text-xs md:tw-text-sm tw-text-gray-600">
+                  Comprehensive interface for doctors to review patient data, provide recommendations, and track treatment progress.
+                </p>
+              </motion.div>
+              <motion.div 
+                className="tw-bg-gradient-to-r tw-from-green-50 tw-to-teal-50 tw-p-4 md:tw-p-6 tw-rounded-lg tw-border tw-border-green-100"
+                whileHover={{ scale: 1.02, y: -2 }}
+                transition={{ duration: 0.2 }}
+              >
+                <h3 className="tw-text-base md:tw-text-lg tw-font-semibold tw-text-gray-800 tw-mb-1">Patient Dashboard</h3>
+                <p className="tw-text-xs md:tw-text-sm tw-text-gray-600">
+                  Personalized dashboard for patients to monitor their health, receive insights, and communicate with healthcare providers.
+                </p>
+              </motion.div>
+            </motion.div>
+            <motion.div 
+              className="tw-relative tw-overflow-hidden tw-rounded-lg tw-shadow md:tw-ml-4"
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              viewport={{ once: true }}
+            >
+              <div className="tw-aspect-video tw-bg-gray-100 tw-flex tw-items-center tw-justify-center">
+                <video autoPlay loop muted src='/videos/vid1.mp4' className="tw-w-full tw-h-full tw-object-cover tw-rounded-lg"></video>
+              </div>
+            </motion.div>
+          </div>
+          <motion.div 
+            className="tw-grid tw-grid-cols-1 md:tw-grid-cols-3 tw-gap-4 md:tw-gap-8 tw-mt-8 md:tw-mt-12"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            viewport={{ once: true }}
+          >
+            <motion.div 
+              className="tw-text-left tw-p-4 tw-bg-white tw-rounded-lg tw-shadow tw-border tw-border-gray-100 hover:tw-shadow-md tw-transition-all"
+              whileHover={{ scale: 1.05, y: -5 }}
+              transition={{ duration: 0.2 }}
+            >
+              <motion.div 
+                className="tw-w-10 tw-h-10 tw-bg-blue-100 tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mb-2"
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                transition={{ duration: 0.2 }}
+              >
+                <svg className="tw-w-5 tw-h-5 tw-text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </motion.div>
+              <h4 className="tw-text-sm md:tw-text-base tw-font-semibold tw-text-gray-800 tw-mb-1">Personalized Care</h4>
+              <p className="tw-text-xs md:tw-text-xs tw-text-gray-600">Care plans tailored to your unique needs.</p>
+            </motion.div>
+            <motion.div 
+              className="tw-text-left tw-p-4 tw-bg-white tw-rounded-lg tw-shadow tw-border tw-border-gray-100 hover:tw-shadow-md tw-transition-all"
+              whileHover={{ scale: 1.05, y: -5 }}
+              transition={{ duration: 0.2 }}
+            >
+              <motion.div 
+                className="tw-w-10 tw-h-10 tw-bg-purple-100 tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mb-2"
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                transition={{ duration: 0.2 }}
+              >
+                <svg className="tw-w-5 tw-h-5 tw-text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </motion.div>
+              <h4 className="tw-text-sm md:tw-text-base tw-font-semibold tw-text-gray-800 tw-mb-1">Real-time Alerts</h4>
+              <p className="tw-text-xs md:tw-text-xs tw-text-gray-600">Instant notifications for critical events.</p>
+            </motion.div>
+            <motion.div 
+              className="tw-text-left tw-p-4 tw-bg-white tw-rounded-lg tw-shadow tw-border tw-border-gray-100 hover:tw-shadow-md tw-transition-all"
+              whileHover={{ scale: 1.05, y: -5 }}
+              transition={{ duration: 0.2 }}
+            >
+              <motion.div 
+                className="tw-w-10 tw-h-10 tw-bg-green-100 tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mb-2"
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                transition={{ duration: 0.2 }}
+              >
+                <svg className="tw-w-5 tw-h-5 tw-text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </motion.div>
+              <h4 className="tw-text-sm md:tw-text-base tw-font-semibold tw-text-gray-800 tw-mb-1">Community Support</h4>
+              <p className="tw-text-xs md:tw-text-xs tw-text-gray-600">Connect with others for support and advice.</p>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
@@ -402,82 +595,104 @@ export const NewHomePage = () => {
         </div>
       </section>
 
-      {/* Footer with simplified design for mobile */}
-      <footer className="tw-bg-gradient-to-br tw-from-[#1E293B] tw-to-[#0F172A] tw-text-white tw-pt-12 md:tw-pt-20 tw-pb-6 md:tw-pb-10 tw-px-4 md:tw-px-6">
+      {/* Enhanced Footer - Clean and Essential */}
+      <footer className="tw-bg-gradient-to-br tw-from-[#1E293B] tw-to-[#0F172A] tw-text-white tw-pt-10 md:tw-pt-16 tw-pb-4 md:tw-pb-8 tw-px-2 sm:tw-px-4 md:tw-px-6">
         <div className="tw-container tw-mx-auto">
-          <div className="tw-flex tw-flex-col lg:tw-flex-row tw-justify-between tw-items-center tw-gap-8 md:tw-gap-10 tw-mb-10 md:tw-mb-16 tw-pb-10 md:tw-pb-16 tw-border-b tw-border-gray-700/50">
+          {/* Main Footer Content */}
+          <motion.div 
+            className="tw-flex tw-flex-col lg:tw-flex-row tw-justify-between tw-items-stretch tw-gap-8 md:tw-gap-12 tw-mb-8 md:tw-mb-12 tw-pb-8 md:tw-pb-12 tw-border-b tw-border-gray-700/50"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            viewport={{ once: true }}
+          >
             {/* Logo and Tagline */}
-            <div className="tw-flex tw-flex-col tw-items-center lg:tw-items-start">
-              <h2 className="tw-text-xl md:tw-text-2xl tw-font-bold tw-bg-clip-text tw-text-transparent tw-bg-gradient-to-r tw-from-blue-400 tw-to-indigo-300">iT1Dixpert</h2>
-              <p className="tw-text-xs md:tw-text-sm tw-text-gray-300 tw-max-w-md tw-text-center lg:tw-text-left tw-mt-2">
+            <motion.div 
+              className="tw-flex tw-flex-col tw-items-center lg:tw-items-start tw-mb-6 lg:tw-mb-0 tw-flex-1"
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+              viewport={{ once: true }}
+            >
+              <h2 className="tw-text-xl sm:tw-text-2xl tw-font-bold tw-bg-clip-text tw-text-transparent tw-bg-gradient-to-r tw-from-blue-400 tw-to-indigo-300">iT1Dixpert</h2>
+              <p className="tw-text-sm sm:tw-text-base tw-text-gray-300 tw-max-w-xs sm:tw-max-w-md tw-text-center lg:tw-text-left tw-mt-2">
                 Empowering diabetes management through technology, education, and community support.
               </p>
-            </div>
+            </motion.div>
             
-            {/* Newsletter Signup - Simplified for mobile */}
-            <div className="tw-w-full lg:tw-w-auto">
-              <h3 className="tw-text-base md:tw-text-xl tw-font-medium tw-text-white tw-mb-2 md:tw-mb-4 tw-text-center lg:tw-text-left">Subscribe to Updates</h3>
-              <div className="tw-flex tw-flex-col sm:tw-flex-row tw-gap-2">
-                <input 
-                  type="email" 
-                  placeholder="Email address" 
-                  className="tw-px-3 md:tw-px-4 tw-py-2 md:tw-py-3 tw-bg-gray-800 tw-text-white tw-rounded-lg tw-border tw-border-gray-700 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-blue-500 tw-text-sm md:tw-text-base"
-                />
-                <button className="tw-bg-blue-600 hover:tw-bg-blue-700 tw-text-white tw-px-4 md:tw-px-6 tw-py-2 md:tw-py-3 tw-rounded-lg tw-font-medium tw-transition-colors tw-text-sm md:tw-text-base">
-                  Subscribe
-                </button>
+            {/* Quick Links and Platform - side by side on mobile and up */}
+            <div className="tw-flex tw-flex-row tw-gap-6 md:tw-gap-8 tw-flex-1 tw-items-start tw-justify-center">
+              <div>
+                <h4 className="tw-text-base sm:tw-text-lg tw-font-medium tw-mb-3 tw-text-blue-400">Quick Links</h4>
+                <ul className="tw-space-y-2">
+                  <li><a href="#features" className="tw-text-sm tw-text-gray-300 hover:tw-text-white tw-transition-colors">Features</a></li>
+                  <li><a href="#statistics" className="tw-text-sm tw-text-gray-300 hover:tw-text-white tw-transition-colors">Statistics</a></li>
+                  <li><a href="#team" className="tw-text-sm tw-text-gray-300 hover:tw-text-white tw-transition-colors">Our Team</a></li>
+                </ul>
+              </div>
+              
+              <div>
+                <h4 className="tw-text-base sm:tw-text-lg tw-font-medium tw-mb-3 tw-text-blue-400">Platform</h4>
+                <ul className="tw-space-y-2">
+                  <li><Link to="/login" className="tw-text-sm tw-text-gray-300 hover:tw-text-white tw-transition-colors">Login</Link></li>
+                  <li><a href="#" className="tw-text-sm tw-text-gray-300 hover:tw-text-white tw-transition-colors">Patient Portal</a></li>
+                  <li><a href="#" className="tw-text-sm tw-text-gray-300 hover:tw-text-white tw-transition-colors">Provider Access</a></li>
+                </ul>
               </div>
             </div>
-          </div>
+          </motion.div>
           
-          {/* Footer Links - Hide less important sections on mobile */}
-          <div className="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-4 tw-gap-6 md:tw-gap-10 tw-mb-8 md:tw-mb-12">
-            {/* Platform Links */}
-            <div>
-              <h4 className="tw-text-base md:tw-text-lg tw-font-medium tw-mb-3 md:tw-mb-5 tw-flex tw-items-center tw-gap-2">
-                <span className="tw-text-blue-400">Platform</span>
-              </h4>
-              <ul className="tw-space-y-2 md:tw-space-y-3">
-                <li><a href="#" className="tw-text-xs md:tw-text-sm tw-text-gray-300 hover:tw-text-white tw-transition-colors">Dashboard</a></li>
-                <li><a href="#" className="tw-text-xs md:tw-text-sm tw-text-gray-300 hover:tw-text-white tw-transition-colors">Patient Portal</a></li>
-                <li><a href="#" className="tw-text-xs md:tw-text-sm tw-text-gray-300 hover:tw-text-white tw-transition-colors">Provider Access</a></li>
-              </ul>
+          {/* Contact Information */}
+          <motion.div 
+            className="tw-flex tw-flex-col sm:tw-flex-row tw-justify-between tw-items-center tw-gap-4 md:tw-gap-8 tw-mb-6 md:tw-mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
+            viewport={{ once: true }}
+          >
+            <div className="tw-flex tw-flex-col xs:tw-flex-row tw-items-center tw-gap-3 sm:tw-gap-6">
+              <div className="tw-flex tw-items-center tw-gap-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="tw-h-4 tw-w-4 tw-text-blue-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 8l9 6 9-6M21 8v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8"
+                  />
+                </svg>
+                <span className="tw-text-sm tw-text-gray-300">support@t1dixpert.com</span>
+              </div>
+              <div className="tw-flex tw-items-center tw-gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="tw-h-4 tw-w-4 tw-text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span className="tw-text-sm tw-text-gray-300">NIT Jalandhar & PGIMER Chandigarh</span>
+              </div>
             </div>
-            
-            {/* Contact - Always visible */}
-            <div className="sm:tw-col-span-2 lg:tw-col-span-1">
-              <h4 className="tw-text-base md:tw-text-lg tw-font-medium tw-mb-3 md:tw-mb-5 tw-flex tw-items-center tw-gap-2">
-                <span className="tw-text-blue-400">Contact Us</span>
-              </h4>
-              <ul className="tw-space-y-2 md:tw-space-y-3">
-                <li className="tw-flex tw-items-center tw-gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="tw-h-4 tw-w-4 tw-text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                  <span className="tw-text-xs md:tw-text-sm tw-text-gray-300">support@t1dixpert.com</span>
-                </li>
-                <li className="tw-flex tw-items-start tw-gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="tw-h-4 tw-w-4 tw-text-blue-400 tw-shrink-0 tw-mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  <span className="tw-text-xs md:tw-text-sm tw-text-gray-300">
-                    NIT Jalandhar & PGIMER Chandigarh, Punjab, India
-                  </span>
-                </li>
-              </ul>
-            </div>
-          </div>
+          </motion.div>
           
           {/* Bottom Bar with Copyright */}
-          <div className="tw-pt-4 md:tw-pt-8 tw-flex tw-flex-col md:tw-flex-row tw-justify-between tw-items-center tw-gap-2 md:tw-gap-4">
-            <p className="tw-text-xs tw-text-gray-400">&copy; {new Date().getFullYear()} T1Dixpert. All rights reserved.</p>
+          <motion.div 
+            className="tw-pt-4 tw-border-t tw-border-gray-700/50 tw-flex tw-flex-col sm:tw-flex-row tw-justify-between tw-items-center tw-gap-2 sm:tw-gap-4"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6, ease: "easeOut" }}
+            viewport={{ once: true }}
+          >
+            <p className="tw-text-xs tw-text-gray-400 tw-text-center sm:tw-text-left">&copy; {new Date().getFullYear()} T1Dixpert. All rights reserved.</p>
             
-            <div className="tw-flex tw-flex-wrap tw-gap-3 md:tw-gap-6 tw-justify-center">
-              <a href="#" className="tw-text-xs tw-text-gray-400 hover:tw-text-white tw-transition-colors">Privacy</a>
-              <a href="#" className="tw-text-xs tw-text-gray-400 hover:tw-text-white tw-transition-colors">Terms</a>
+            <div className="tw-flex tw-gap-4 tw-justify-center sm:tw-justify-end">
+              <a href="#" className="tw-text-xs tw-text-gray-400 hover:tw-text-white tw-transition-colors">Privacy Policy</a>
+              <a href="#" className="tw-text-xs tw-text-gray-400 hover:tw-text-white tw-transition-colors">Terms of Service</a>
             </div>
-          </div>
+          </motion.div>
         </div>
       </footer>
     </div>

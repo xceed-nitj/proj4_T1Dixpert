@@ -3,32 +3,32 @@ import React from 'react';
 const teamDetailsNITJ = [
     {
         name: "Dr. D Harimurugan",
-        image: "../../public/team/image1.png",
+        image: "/team/image1.png",
         designation: "Assistant Professor in the Department of Electrical Engineering",
         specialization: "Machine learning, Explainable AI & Software development",
     },
     {
         name: "Prof. Arun Khosla",
-        image: "../../public/team/image2.png",
+        image: "/team/image2.png",
         designation: "Professor in the Department of Electronics and Communication Engineering",
         specialization: "AI, Gamification and Assistive technologies, Human-Centric Design",
         additionalRole: "Head, Centre for Artificial Intelligence"
     },
     {
         name: "Dr. Amritpal Singh",
-        image: "../../public/team/image3.png",
+        image: "/team/image3.png",
         designation: "Assistant Professor in the Department of Computer Science Engineering",
         specialization: "AI, Cloud computing and Machine learning",
     },
     {
         name: "Dr. Khusal shah",
-        image: "../../public/team/image4.png",
+        image: "/team/image4.png",
         designation: "Software developer",
         specialization: "Machine learning & Software development",
     },
     {
         name: "Dr. Kulbhushan Chand",
-        image: "../../public/team/image5.png",
+        image: "/team/image5.png",
         designation: "Postdoctoral Fellow at IIT Mandi iHUb and HCI foundation",
         specialization: "Human Computer Interaction",
     }
@@ -38,13 +38,13 @@ const teamDetailsNITJ = [
 const teamDetailsPGIMER = [
     {
         name: "Dr. Rakesh Kumar",
-        image: "../../public/team/image6.png",
+        image: "/team/image6.png",
         designation: "Professor at PGIMER Chandigarh",
         specialization: "T1D management and Clinical trials",
     },
     {
         name: "Dr. Jaivinder Yadav",
-        image: "../../public/team/image7.png",
+        image: "/team/image7.png",
         designation: "Additional Professor at Pediatric Endocrinology Unit PGIMER Chandigarh",
         specialization: "T1D management, Pediatric endocrinology, Clinical trials",
     }
