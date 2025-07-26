@@ -118,6 +118,8 @@ const PatientDetailView = ({ patientId }) => {
   // Process data for charts
  const processChartData = (data) => {
   if (!data || data.length === 0) return;
+  console.log('Processing chart data:', data);
+
 
   const formattedData = data.map((reading, index) => {
     const { date, time, bloodSugar, carboLevel, insulin, session } = reading.data;
@@ -145,6 +147,7 @@ const PatientDetailView = ({ patientId }) => {
   formattedData.sort((a, b) => a.timestamp - b.timestamp);
   
   setChartData(formattedData);
+  console.log('Chart data:', formattedData);
 };
 
 // Add this helper function to create evenly spaced data:
@@ -282,6 +285,7 @@ const testDateRange = () => {
     });
     
     console.log('Filtered entries:', filtered.length);
+    console.log("filteredData:", filtered);
   }
   
   // Apply even spacing to the filtered data
@@ -425,19 +429,55 @@ const testDateRange = () => {
                <TabPanel p={0} pt={4}>
                 <Card variant="outline">
                   <CardHeader>
-                    <Heading size="md">
+                    {/* <Heading size="md">
                       <Flex align="center">
                         <Icon as={FiBarChart2} mr={2} />
                         Health Trends
                       </Flex>
-                    </Heading>
+                    </Heading> */}
+                    <Flex align="center" justify="space-between">
+                        <Flex align="center">
+                          <Icon as={FiBarChart2} mr={2} />
+                          Health Trends
+                        </Flex>
+                        <Flex gap={4}>
+                          <Select 
+                            border={'1px solid gray.300'}
+                            size="md" 
+                            value={selectedMetric} 
+                            onChange={(e) => setSelectedMetric(e.target.value)}
+                            width="auto"
+                             zIndex={10}
+
+                          >
+                            <option value="All">ALL</option>
+                            <option value="bloodSugar">Blood Sugar</option>
+                            <option value="carboLevel">Carbs</option>
+                            <option value="insulin">Insulin</option>
+                           
+                          </Select>
+                          <Select 
+                            size="md" 
+                            value={selectedRange} 
+                            onChange={(e) => setSelectedRange(e.target.value)}
+                            width="auto"
+                            zIndex={10}
+                          >
+                            <option value="3 days">Past 3 Days</option>
+                            <option value="1 week">Past 1 Week</option>
+                            <option value="2 weeks">Past 2 Weeks</option>
+                            <option value="1 month">Past 1 Month</option>
+                            <option value="all">All Data</option>
+                          </Select>
+                        </Flex>
+                      </Flex>
                   </CardHeader>
                   <CardBody>
                     {chartData.length > 0 ? (
                       <Box h="400px">
                         <ResponsiveContainer width="100%" height="100%">
-                          <LineChart
-                            data={chartData}
+                          {/* <LineChart
+                            data={filteredData}
                             margin={{
                               top: 5,
                               right: 30,
@@ -447,16 +487,16 @@ const testDateRange = () => {
                           >
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis
-                              dataKey="date"
-                              tickFormatter={(date) =>
-                                format(new Date(date), 'MMM dd')
+                              dataKey="parsedDate"
+                              tickFormatter={(parsedDate) =>
+                                format(new Date(parsedDate), 'MMM dd')
                               }
                             />
                             <YAxis yAxisId="left" />
                             <YAxis yAxisId="right" orientation="right" />
                             <Tooltip
-                              labelFormatter={(date) =>
-                                format(new Date(date), 'MMM dd, yyyy')
+                              labelFormatter={(parsedDate) =>
+                                format(new Date(parsedDate), 'MMM dd, yyyy')
                               }
                             />
                             <Legend />
@@ -490,7 +530,86 @@ const testDateRange = () => {
                               dot={{ r: 4 }}
                               activeDot={{ r: 6 }}
                             />
-                          </LineChart>
+                          </LineChart> */}
+                          <LineChart
+  data={filteredData}
+  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+>
+  <CartesianGrid strokeDasharray="3 3" />
+  <XAxis
+    dataKey="parsedDate"
+    tickFormatter={(parsedDate) =>
+      format(new Date(parsedDate), 'MMM dd')
+    }
+  />
+  <YAxis yAxisId="left" />
+  <YAxis yAxisId="right" orientation="right" />
+  <Tooltip
+    labelFormatter={(parsedDate) =>
+      format(new Date(parsedDate), 'MMM dd, yyyy')
+    }
+  />
+  <Legend />
+
+  {selectedMetric === 'All' ? (
+    <>
+      <Line
+        yAxisId="left"
+        type="monotone"
+        dataKey="bloodSugar"
+        name="Blood Sugar"
+        stroke="#5BA9B3"
+        strokeWidth={2}
+        dot={{ r: 4 }}
+        activeDot={{ r: 6 }}
+      />
+      <Line
+        yAxisId="left"
+        type="monotone"
+        dataKey="carboLevel"
+        name="Carbs"
+        stroke="#3B5998"
+        strokeWidth={2}
+        dot={{ r: 4 }}
+        activeDot={{ r: 6 }}
+      />
+      <Line
+        yAxisId="right"
+        type="monotone"
+        dataKey="insulin"
+        name="Insulin"
+        stroke="#FF8C00"
+        strokeWidth={2}
+        dot={{ r: 4 }}
+        activeDot={{ r: 6 }}
+      />
+    </>
+  ) : (
+    <Line
+      yAxisId={selectedMetric === 'insulin' ? 'right' : 'left'}
+      type="monotone"
+      dataKey={selectedMetric}
+      name={
+        selectedMetric === 'bloodSugar'
+          ? 'Blood Sugar'
+          : selectedMetric === 'carboLevel'
+          ? 'Carbs'
+          : 'Insulin'
+      }
+      stroke={
+        selectedMetric === 'bloodSugar'
+          ? '#5BA9B3'
+          : selectedMetric === 'carboLevel'
+          ? '#3B5998'
+          : '#FF8C00'
+      }
+      strokeWidth={2}
+      dot={{ r: 4 }}
+      activeDot={{ r: 6 }}
+    />
+  )}
+</LineChart>
+
                         </ResponsiveContainer>
                       </Box>
                     ) : (
@@ -508,10 +627,10 @@ const testDateRange = () => {
                   </CardBody>
                 </Card>
               </TabPanel>
-              <TabPanel p={0} pt={4}>
+              {/* <TabPanel p={0} pt={4}>
                 <Card variant="outline">
                   <CardHeader>
-                    <Heading size="md">
+                    
                       <Flex align="center" justify="space-between">
                         <Flex align="center">
                           <Icon as={FiBarChart2} mr={2} />
@@ -519,21 +638,26 @@ const testDateRange = () => {
                         </Flex>
                         <Flex gap={4}>
                           <Select 
+                            border={'1px solid gray.300'}
                             size="md" 
                             value={selectedMetric} 
                             onChange={(e) => setSelectedMetric(e.target.value)}
                             width="auto"
+                             zIndex={10}
+
                           >
                             <option value="All">ALL</option>
                             <option value="bloodSugar">Blood Sugar</option>
                             <option value="carboLevel">Carbs</option>
                             <option value="insulin">Insulin</option>
+                           
                           </Select>
                           <Select 
                             size="md" 
                             value={selectedRange} 
                             onChange={(e) => setSelectedRange(e.target.value)}
                             width="auto"
+                            zIndex={10}
                           >
                             <option value="3 days">Past 3 Days</option>
                             <option value="1 week">Past 1 Week</option>
@@ -543,9 +667,9 @@ const testDateRange = () => {
                           </Select>
                         </Flex>
                       </Flex>
-                    </Heading>
+                    
                   </CardHeader>
-                  {/* console.log('ppdate',parsedDate); */}
+                  
                   <CardBody>
                     {filteredData.length > 0 ? (
                       <Box h="400px">
@@ -659,7 +783,7 @@ const testDateRange = () => {
                     )}
                   </CardBody>
                 </Card>
-              </TabPanel>
+              </TabPanel> */}
               <TabPanel p={0} pt={4}>
                 <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
                   <Card variant="outline">
