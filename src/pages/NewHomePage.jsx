@@ -588,9 +588,9 @@ export const NewHomePage = () => {
                   key={index}
                   className="tw-bg-white tw-rounded-xl tw-shadow-md tw-overflow-hidden hover:tw-shadow-lg tw-transition-all tw-border tw-border-gray-100"
                 >
-                  <div className="tw-flex tw-flex-row tw-h-full">
+                  <div className="tw-flex tw-flex-row tw-h-full tw-border-2 tw-border-blue-100 tw-overflow-hidden">
                     {/* Photo left, details right, on all screens */}
-                    <div className="tw-flex-shrink-0 tw-flex tw-items-center tw-justify-center tw-bg-blue-50" style={{width: '112px', minWidth: '112px', height: '160px'}}>
+                    <div className="tw-flex-shrink-0 tw-flex tw-items-center tw-justify-center 0" style={{width: '112px', minWidth: '112px', height: '160px'}}>
                       <img
                         src={member.image}
                         alt={member.name}
@@ -598,7 +598,7 @@ export const NewHomePage = () => {
                         style={{maxHeight: '160px'}}
                       />
                     </div>
-                    <div className="tw-flex-1 tw-p-3 md:tw-p-4 tw-bg-gradient-to-br tw-from-blue-50 tw-to-white tw-flex tw-flex-col tw-justify-center">
+                    <div className="tw-flex-1 tw-p-3 md:tw-p-4  tw-flex tw-flex-col tw-justify-center">
                       <h3 className="tw-text-base md:tw-text-lg tw-font-medium tw-text-gray-800 tw-mb-1">{member.name}</h3>
                       <p className="tw-text-xs md:tw-text-sm tw-text-blue-600 tw-mb-1 md:tw-mb-2">{member.designation}</p>
                       <p className="tw-text-xs tw-text-gray-600 tw-mb-1">{member.specialization}</p>
@@ -623,9 +623,9 @@ export const NewHomePage = () => {
                   key={index}
                   className="tw-bg-white tw-rounded-xl tw-shadow-md tw-overflow-hidden hover:tw-shadow-lg tw-transition-all tw-border tw-border-gray-100"
                 >
-                  <div className="tw-flex tw-flex-row tw-h-full">
+                  <div className="tw-flex tw-flex-row tw-h-full tw-border-2 tw-border-blue-100 tw-overflow-hidden">
                     {/* Photo left, details right, on all screens */}
-                    <div className="tw-flex-shrink-0 tw-flex tw-items-center tw-justify-center tw-bg-blue-50" style={{width: '112px', minWidth: '112px', height: '160px'}}>
+                    <div className="tw-flex-shrink-0 tw-flex tw-items-center tw-justify-center " style={{width: '112px', minWidth: '112px', height: '160px'}}>
                       <img
                         src={member.image}
                         alt={member.name}
@@ -633,8 +633,8 @@ export const NewHomePage = () => {
                         style={{maxHeight: '160px'}}
                       />
                     </div>
-                    <div className="tw-flex-1 tw-p-3 md:tw-p-4 tw-bg-gradient-to-br tw-from-blue-50 tw-to-white tw-flex tw-flex-col tw-justify-center">
-                      <h3 className="tw-text-base md:tw-text-lg tw-font-medium tw-text-gray-800 tw-mb-1">{member.name}</h3>
+                      <div className="tw-flex-1 tw-p-3 md:tw-p-4  tw-flex tw-flex-col tw-justify-center">
+                        <h3 className="tw-text-base md:tw-text-lg tw-font-medium tw-text-gray-800 tw-mb-1">{member.name}</h3>
                       <p className="tw-text-xs md:tw-text-sm tw-text-blue-600 tw-mb-1 md:tw-mb-2">{member.designation}</p>
                       <p className="tw-text-xs tw-text-gray-600">{member.specialization}</p>
                     </div>
