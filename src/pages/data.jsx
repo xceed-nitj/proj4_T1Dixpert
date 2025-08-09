@@ -95,7 +95,7 @@ const platformFeatures = [
 
   // T1D Statistics (Dummy data)
   const t1dStatistics = [
-    { value: '1.1M+', label: 'Children with T1D in India', description: 'India has one of the largest populations of children with Type 1 Diabetes' },
+    { value: '0.2M+', label: 'Children with T1D in India', description: 'India has one of the largest populations of children with Type 1 Diabetes' },
     { value: '8.4M', label: 'People living with T1D globally', description: 'Type 1 Diabetes affects millions of people around the world' },
     { value: '9%', label: 'Annual increase in T1D cases', description: 'The prevalence of Type 1 Diabetes is rising each year' },
     { value: '78%', label: 'T1D patients struggle with management', description: 'Most patients face challenges with daily diabetes management' },
