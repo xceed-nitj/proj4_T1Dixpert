@@ -23,6 +23,9 @@ export const NewHomePage = () => {
     '/hero-images/img1.jpg',
     '/hero-images/img2.jpg',
     '/hero-images/img3.jpg',
+    '/hero-images/img4.jpeg',
+    '/hero-images/img5.jpeg',
+    '/hero-images/img6.jpeg',
   ];
 
   const dashBoardImages = [
